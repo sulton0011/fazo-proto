@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/file_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+service FileService {
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {
+    option (google.api.http) = {
+      post: "/v1/files"
+      body: "*"
+    };
+  }
+
+  rpc GetFile(GetFileRequest) returns (GetFileResponse) {
+    option (google.api.http) = {get: "/v1/files/{id}"};
+  }
+
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {
+    option (google.api.http) = {delete: "/v1/files/{id}"};
+  }
+}

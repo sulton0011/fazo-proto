@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+message Background {
+  string id             = 1;
+  string uploader_id    = 2;
+  string object_key     = 3;
+  string thumbnail_key  = 4;
+  int64  original_size  = 5;
+  int64  thumbnail_size = 6;
+  string content_type   = 7;
+  int32  width          = 8;
+  int32  height         = 9;
+  int64  created_at     = 10;
+}
+
+message CreateBackgroundRequest {
+  string object_key     = 1;
+  string thumbnail_key  = 2;
+  int64  original_size  = 3;
+  int64  thumbnail_size = 4;
+  string content_type   = 5;
+  int32  width          = 6;
+  int32  height         = 7;
+}
+
+message CreateBackgroundResponse {
+  Background background = 1;
+}
+
+message GetAllBackgroundsRequest {}
+
+message GetAllBackgroundsResponse {
+  repeated Background backgrounds = 1;
+}
+
+message GetBackgroundByIDRequest {
+  string id = 1;
+}
+
+message GetBackgroundByIDResponse {
+  Background background = 1;
+}
+
+message DeleteBackgroundRequest {
+  string id = 1;
+}
+
+message DeleteBackgroundResponse {}

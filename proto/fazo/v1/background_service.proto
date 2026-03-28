@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/background_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+service BackgroundService {
+  rpc CreateBackground(CreateBackgroundRequest) returns (CreateBackgroundResponse) {
+    option (google.api.http) = {
+      post: "/v1/backgrounds"
+      body: "*"
+    };
+  }
+
+  rpc GetAllBackgrounds(GetAllBackgroundsRequest) returns (GetAllBackgroundsResponse) {
+    option (google.api.http) = {get: "/v1/backgrounds"};
+  }
+
+  rpc GetBackgroundByID(GetBackgroundByIDRequest) returns (GetBackgroundByIDResponse) {
+    option (google.api.http) = {get: "/v1/backgrounds/{id}"};
+  }
+
+  rpc DeleteBackground(DeleteBackgroundRequest) returns (DeleteBackgroundResponse) {
+    option (google.api.http) = {delete: "/v1/backgrounds/{id}"};
+  }
+}

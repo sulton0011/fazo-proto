@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+message FileRecord {
+  string id             = 1;
+  string uploader_id    = 2;
+  string entity_type    = 3;
+  string entity_id      = 4;
+  string object_key     = 5;
+  string thumbnail_key  = 6;
+  int64  original_size  = 7;
+  int64  thumbnail_size = 8;
+  string content_type   = 9;
+  int32  width          = 10;
+  int32  height         = 11;
+  int64  created_at     = 12;
+}
+
+message UploadFileRequest {
+  string entity_type   = 1; // 'chat' | 'post' | 'comment' | 'profile'
+  string entity_id     = 2;
+  string object_key    = 3;
+  string content_type  = 4;
+  int64  original_size = 5;
+  int32  width         = 6;
+  int32  height        = 7;
+}
+
+message UploadFileResponse {
+  FileRecord file = 1;
+}
+
+message GetFileRequest {
+  string id = 1;
+}
+
+message GetFileResponse {
+  FileRecord file = 1;
+}
+
+message DeleteFileRequest {
+  string id = 1;
+}
+
+message DeleteFileResponse {}

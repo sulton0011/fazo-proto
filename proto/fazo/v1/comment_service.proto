@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/comment_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+service CommentService {
+  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/comments"
+      body: "*"
+    };
+  }
+
+  rpc GetComments(GetCommentsRequest) returns (GetCommentsResponse) {
+    option (google.api.http) = {get: "/v1/posts/{post_id}/comments"};
+  }
+
+  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse) {
+    option (google.api.http) = {
+      patch: "/v1/comments/{id}"
+      body:  "*"
+    };
+  }
+
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
+    option (google.api.http) = {delete: "/v1/comments/{id}"};
+  }
+
+  rpc ReactToComment(ReactToCommentRequest) returns (ReactToCommentResponse) {
+    option (google.api.http) = {
+      post: "/v1/comments/{id}/react"
+      body: "*"
+    };
+  }
+
+  // StreamComments — real-time comment updates via server-streaming (ConnectRPC only, no gateway)
+  rpc StreamComments(StreamCommentsRequest) returns (stream Comment);
+}

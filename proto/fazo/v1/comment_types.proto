@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+
+message Comment {
+  string          id             = 1;
+  string          post_id        = 2;
+  string          user_id        = 3;
+  string          text           = 4;
+  repeated string images         = 5;
+  repeated string videos         = 6;
+  repeated string voice_messages = 7;
+  string          reply_to       = 8; // empty = top-level
+  string          reactions      = 9; // JSON string: {"👍":["user_id1",...]}
+  int64           created_at     = 10;
+}
+
+message CreateCommentRequest {
+  string          post_id        = 1;
+  string          text           = 2;
+  repeated string images         = 3;
+  repeated string videos         = 4;
+  repeated string voice_messages = 5;
+  string          reply_to       = 6; // optional
+}
+
+message CreateCommentResponse {
+  Comment comment = 1;
+}
+
+message GetCommentsRequest {
+  string post_id  = 1;
+  int32  page     = 2; // offset-based, 1-indexed
+  int32  page_size = 3; // default 20
+}
+
+message GetCommentsResponse {
+  repeated Comment comments = 1;
+  int32            total    = 2;
+}
+
+message UpdateCommentRequest {
+  string          id             = 1;
+  string          text           = 2;
+  repeated string images         = 3;
+  repeated string videos         = 4;
+  repeated string voice_messages = 5;
+}
+
+message UpdateCommentResponse {
+  Comment comment = 1;
+}
+
+message DeleteCommentRequest {
+  string id = 1;
+}
+
+message DeleteCommentResponse {}
+
+message ReactToCommentRequest {
+  string id        = 1;
+  string reactions = 2; // JSON string: {"👍":["user_id1",...]}
+}
+
+message ReactToCommentResponse {
+  Comment comment = 1;
+}
+
+message StreamCommentsRequest {
+  string post_id = 1;
+}
