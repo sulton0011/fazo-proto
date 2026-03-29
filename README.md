@@ -38,81 +38,37 @@ go install github.com/bufbuild/buf/cmd/buf@latest
 
 ---
 
-## Serviceга qo'shish va ishlatish
+## Go service uchun sozlash
 
-### 1. fazo-proto ni service ichiga qo'shish
-
-Service loyiha root directorysida `fazo-proto/` papkasini yarating:
+### 1. fazo-proto ni clone qilish
 
 ```bash
-# Loyiha ichida
 cd your-service/
-
-# fazo-proto ni clone qiling
 git clone git@github.com:sulton0011/fazo-proto.git fazo-proto
 ```
 
-Papka tuzilmasi:
-```
-your-service/
-├── fazo-proto/        # clone qilingan proto
-├── gen/               # generate qilingan Go fayllari (commitlanadi)
-├── buf.gen.yaml       # service dagi generation config
-└── ...
-```
-
-### 2. buf.gen.yaml sozlash
-
-Service root directorysida `buf.gen.yaml` yarating yoki yangilang:
-
-```yaml
-version: v2
-inputs:
-  - directory: fazo-proto/proto   # lokal fazo-proto/proto papkasiga yo'l
-
-plugins:
-  - remote: buf.build/protocolbuffers/go
-    out: gen
-    opt:
-      - paths=source_relative
-
-  - remote: buf.build/grpc/go
-    out: gen
-    opt:
-      - paths=source_relative
-      - require_unimplemented_servers=false
-
-  - remote: buf.build/connectrpc/go
-    out: gen
-    opt:
-      - paths=source_relative
-
-  - remote: buf.build/grpc-ecosystem/gateway
-    out: gen
-    opt:
-      - paths=source_relative
-      - generate_unbound_methods=true
-```
-
-### 3. Go moduleda import yo'lini sozlash
-
-Proto fayllaridagi `go_package` option `your-service/gen/fazo/v1` formatida bo'lishi kerak. Fazo-proto da bu allaqachon sozlangan.
-
-`go.mod` faylingizda tashqi proto moduli **kerak emas** — generate qilingan kod to'g'ridan-to'g'ri service moduliga tegishli bo'ladi.
-
-### 4. Kod generate qilish
+### 2. buf.gen.yaml olish
 
 ```bash
-# Service root directorysida
-buf generate
-
-# Generate bo'lgan fayllar gen/ papkasiga tushadi
-ls gen/fazo/v1/
+cp fazo-proto/buf.gen.yaml ./buf.gen.yaml
 ```
 
-Generate bo'lgan `gen/` papkasini `.gitignore` ga **qo'shmang** — u service repoga commitlanishi kerak.
+Faylni oching va `directory:` qiymatini to'g'rilang:
 
-### 5. Service kodida ishlatish
+```yaml
+inputs:
+  - directory: fazo-proto/proto   # fazo-proto/proto ga o'zgartiring
+```
+
+### 3. Kod generate qilish
+
+```bash
+buf generate
+```
+
+Generate bo'lgan fayllar `gen/` papkasiga tushadi. `gen/` ni `.gitignore` ga **qo'shmang** — commitlanishi kerak.
+
+### 4. Service kodida ishlatish
 
 ```go
 import (
@@ -123,52 +79,67 @@ import (
 
 ---
 
-## Proto o'zgarganda yangilash
+## Dart (Flutter) uchun sozlash
 
-Proto manba fayllar o'zgarganda:
+### 1. fazo-proto ni clone qilish
 
 ```bash
-# 1. fazo-proto ni yangilang
+cd your-flutter-app/
+git clone git@github.com:sulton0011/fazo-proto.git fazo-proto
+```
+
+### 2. buf.gen.dart.yaml olish
+
+```bash
+cp fazo-proto/buf.gen.dart.yaml ./buf.gen.dart.yaml
+```
+
+Faylni oching va `directory:` qiymatini to'g'rilang:
+
+```yaml
+inputs:
+  - directory: fazo-proto/proto   # fazo-proto/proto ga o'zgartiring
+```
+
+### 3. Kod generate qilish
+
+```bash
+buf generate --template buf.gen.dart.yaml
+```
+
+Generate bo'lgan Dart fayllari `gen/dart/` papkasiga tushadi.
+
+### 4. Flutter kodida ishlatish
+
+`pubspec.yaml` ga generate qilingan papkani qo'shing:
+
+```yaml
+dependencies:
+  protobuf: ^3.1.0
+  grpc: ^3.2.4
+```
+
+---
+
+## Proto o'zgarganda yangilash
+
+```bash
 cd fazo-proto/
 git pull origin master
 cd ..
 
-# 2. Qayta generate qiling
-buf generate
-
-# 3. O'zgarishlarni commit qiling
-git add gen/
-git commit -m "chore: regenerate proto from fazo-proto"
+buf generate                                    # Go
+buf generate --template buf.gen.dart.yaml       # Dart
 ```
 
 ---
 
-## Dart generation
+## Makefile
 
-Flutter/Dart loyihalari uchun:
-
-```bash
-cd fazo-proto/
-
-# Dart fayllarini generate qilish
-make generate-dart
-# yoki
-buf generate --template buf.gen.dart.yaml
-
-# Generate bo'lgan Dart fayllari gen/dart/ papkasida
-ls gen/dart/
-```
-
----
-
-## Makefile buyruqlari
-
-`fazo-proto/` ichida (agar proto reponing o'zida ishlayotgan bo'lsangiz):
+`fazo-proto/` ichida Go + Dart ni bir vaqtda generate qilish:
 
 ```bash
-make generate        # Go + Dart ikkalasini generate qilish
-make generate-go     # Faqat Go generation
-make generate-dart   # Faqat Dart generation
+make generate
 ```
 
 ---
