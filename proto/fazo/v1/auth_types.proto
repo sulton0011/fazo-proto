@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package fazo.v1;
 
-option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message RegisterRequest {
   string full_name = 1;

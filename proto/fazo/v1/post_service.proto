@@ -5,7 +5,7 @@ package fazo.v1;
 import "fazo/v1/post_types.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/sulton0011/fazo-proto/gen/fazo/v1;fazov1";
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 service PostService {
   rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
