@@ -8,22 +8,28 @@ import "google/api/annotations.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 service BackgroundService {
-  rpc CreateBackground(CreateBackgroundRequest) returns (CreateBackgroundResponse) {
-    option (google.api.http) = {
-      post: "/v1/backgrounds"
-      body: "*"
-    };
-  }
+    rpc CreateBackground(CreateBackgroundRequest) returns (CreateBackgroundResponse) {
+        option (google.api.http) = {
+            post: "/v1/backgrounds"
+            body: "*"
+        };
+    }
 
-  rpc GetAllBackgrounds(GetAllBackgroundsRequest) returns (GetAllBackgroundsResponse) {
-    option (google.api.http) = {get: "/v1/backgrounds"};
-  }
+    rpc GetAllBackgrounds(GetAllBackgroundsRequest) returns (GetAllBackgroundsResponse) {
+        option (google.api.http) = {
+            get: "/v1/backgrounds"
+        };
+    }
 
-  rpc GetBackgroundByID(GetBackgroundByIDRequest) returns (GetBackgroundByIDResponse) {
-    option (google.api.http) = {get: "/v1/backgrounds/{id}"};
-  }
+    rpc GetBackgroundByID(GetBackgroundByIDRequest) returns (GetBackgroundByIDResponse) {
+        option (google.api.http) = {
+            get: "/v1/backgrounds/{id}"
+        };
+    }
 
-  rpc DeleteBackground(DeleteBackgroundRequest) returns (DeleteBackgroundResponse) {
-    option (google.api.http) = {delete: "/v1/backgrounds/{id}"};
-  }
+    rpc DeleteBackground(DeleteBackgroundRequest) returns (DeleteBackgroundResponse) {
+        option (google.api.http) = {
+            delete: "/v1/backgrounds/{id}"
+        };
+    }
 }

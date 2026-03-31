@@ -5,66 +5,66 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Message {
-  string          id             = 1;
-  string          sender_id      = 2;
-  string          recipient_id   = 3;
-  string          content        = 4;
-  repeated string images         = 5;
-  repeated string videos         = 6;
-  repeated string voice_messages = 7;
-  int64           created_at     = 8;
+    string id                      = 1;
+    string sender_id               = 2;
+    string recipient_id            = 3;
+    string content                 = 4;
+    repeated string images         = 5;
+    repeated string videos         = 6;
+    repeated string voice_messages = 7;
+    int64 created_at               = 8;
 }
 
 message ChatSummary {
-  string  contact_id   = 1; // boshqa foydalanuvchi ID si
-  Message last_message = 2;
-  int64   unread_count = 3;
-  bool    is_pinned    = 4;
+    string contact_id    = 1;  // boshqa foydalanuvchi ID si
+    Message last_message = 2;
+    int64 unread_count   = 3;
+    bool is_pinned       = 4;
 }
 
 message PinnedChat {
-  string contact_id = 1;
-  int64  created_at = 2;
+    string contact_id = 1;
+    int64 created_at  = 2;
 }
 
 message SendMessageRequest {
-  string          recipient_id   = 1;
-  string          content        = 2;
-  repeated string images         = 3;
-  repeated string videos         = 4;
-  repeated string voice_messages = 5;
+    string recipient_id            = 1;
+    string content                 = 2;
+    repeated string images         = 3;
+    repeated string videos         = 4;
+    repeated string voice_messages = 5;
 }
 
 message SendMessageResponse {
-  Message message = 1;
+    Message message = 1;
 }
 
 message GetMessagesRequest {
-  string contact_id = 1;
-  int64  cursor     = 2; // Unix timestamp, 0 = latest
-  int32  page_size  = 3; // default 30
+    string contact_id = 1;
+    int64 cursor      = 2;  // Unix timestamp, 0 = latest
+    int32 page_size   = 3;  // default 30
 }
 
 message GetMessagesResponse {
-  repeated Message messages    = 1;
-  int64            next_cursor = 2; // 0 = no more
-  bool             has_more    = 3;
+    repeated Message messages = 1;
+    int64 next_cursor         = 2;  // 0 = no more
+    bool has_more             = 3;
 }
 
 message UpdateMessageRequest {
-  string          id             = 1;
-  string          content        = 2;
-  repeated string images         = 3;
-  repeated string videos         = 4;
-  repeated string voice_messages = 5;
+    string id                      = 1;
+    string content                 = 2;
+    repeated string images         = 3;
+    repeated string videos         = 4;
+    repeated string voice_messages = 5;
 }
 
 message UpdateMessageResponse {
-  Message message = 1;
+    Message message = 1;
 }
 
 message DeleteMessageRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message DeleteMessageResponse {}
@@ -72,26 +72,26 @@ message DeleteMessageResponse {}
 message GetChatListRequest {}
 
 message GetChatListResponse {
-  repeated ChatSummary chats = 1;
+    repeated ChatSummary chats = 1;
 }
 
 message GetUnreadCountRequest {
-  string contact_id = 1;
+    string contact_id = 1;
 }
 
 message GetUnreadCountResponse {
-  int64 count = 1;
+    int64 count = 1;
 }
 
 message MarkMessagesAsReadRequest {
-  string contact_id = 1;
+    string contact_id = 1;
 }
 
 message MarkMessagesAsReadResponse {}
 
 message SetChatPinnedRequest {
-  string contact_id = 1;
-  bool   pinned     = 2;
+    string contact_id = 1;
+    bool pinned       = 2;
 }
 
 message SetChatPinnedResponse {}
@@ -99,9 +99,9 @@ message SetChatPinnedResponse {}
 message GetPinnedChatsRequest {}
 
 message GetPinnedChatsResponse {
-  repeated PinnedChat pinned_chats = 1;
+    repeated PinnedChat pinned_chats = 1;
 }
 
 message StreamMessagesRequest {
-  string contact_id = 1; // empty = listen to all incoming messages
+    string contact_id = 1;  // empty = listen to all incoming messages
 }

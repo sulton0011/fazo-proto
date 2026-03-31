@@ -25,7 +25,7 @@ plugins:
     opt:
       - allow_merge=true
       - merge_file_name=swagger
-      - json_names_for_fields=false
+      - json_names_for_fields=true
       - use_allof_for_refs=true
       - disable_service_tags=true
       - disable_default_errors=true

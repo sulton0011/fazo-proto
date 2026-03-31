@@ -5,81 +5,81 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Post {
-  string          id          = 1;
-  string          creator_id  = 2;
-  string          title       = 3;
-  string          description = 4;
-  repeated string pictures    = 5;
-  repeated string tags        = 6;
-  int32           likes       = 7;
-  string          reactions   = 8; // JSON string: {"👍":5,"❤️":3}
-  int64           delete_at   = 9; // 0 = abadiy
-  int64           created_at  = 10;
+    string id                = 1;
+    string creator_id        = 2;
+    string title             = 3;
+    string description       = 4;
+    repeated string pictures = 5;
+    repeated string tags     = 6;
+    int32 likes              = 7;
+    string reactions         = 8;  // JSON string: {"👍":5,"❤️":3}
+    int64 delete_at          = 9;  // 0 = abadiy
+    int64 created_at         = 10;
 }
 
 message CreatePostRequest {
-  string          title        = 1;
-  string          description  = 2;
-  repeated string pictures     = 3;
-  repeated string tags         = 4;
-  int64           delete_after = 5; // seconds from now, 0 = abadiy
+    string title             = 1;
+    string description       = 2;
+    repeated string pictures = 3;
+    repeated string tags     = 4;
+    int64 delete_after       = 5;  // seconds from now, 0 = abadiy
 }
 
 message CreatePostResponse {
-  Post post = 1;
+    Post post = 1;
 }
 
 message GetPostRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message GetPostResponse {
-  Post post = 1;
+    Post post = 1;
 }
 
 message GetAllPostsRequest {
-  string cursor    = 1; // ULID, optional — cursor-based pagination
-  int32  page_size = 2; // default 20, max 50
+    string cursor   = 1;  // ULID, optional — cursor-based pagination
+    int32 page_size = 2;  // default 20, max 50
 }
 
 message GetAllPostsResponse {
-  repeated Post posts       = 1;
-  string        next_cursor = 2;
-  bool          has_more    = 3;
+    repeated Post posts = 1;
+    string next_cursor  = 2;
+    bool has_more       = 3;
 }
 
 message UpdatePostRequest {
-  string          id          = 1;
-  string          title       = 2;
-  string          description = 3;
-  repeated string pictures    = 4;
-  repeated string tags        = 5;
+    string id                = 1;
+    string title             = 2;
+    string description       = 3;
+    repeated string pictures = 4;
+    repeated string tags     = 5;
 }
 
 message UpdatePostResponse {
-  Post post = 1;
+    Post post = 1;
 }
 
 message DeletePostRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message DeletePostResponse {}
 
 message SearchPostsByTitleRequest {
-  string query     = 1;
-  int32  page_size = 2; // default 20
+    string query    = 1;
+    int32 page_size = 2;  // default 20
 }
 
 message SearchPostsByTitleResponse {
-  repeated Post posts = 1;
+    repeated Post posts = 1;
 }
 
 message LikePostRequest {
-  string id    = 1;
-  bool   liked = 2; // true = +1, false = -1
+    string id  = 1;
+    bool liked = 2;  // true = +1, false = -1
 }
 
 message LikePostResponse {
-  Post post = 1;
+    Post post = 1;
 }

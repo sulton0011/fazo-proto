@@ -7,78 +7,78 @@ import "fazo/v1/auth_types.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message UpdateUserRequest {
-  string full_name = 1;
-  string bio       = 2;
-  string phone     = 3; // optional, E.164
+    string full_name = 1;
+    string bio       = 2;
+    string phone     = 3;  // optional, E.164
 }
 
 message UpdateUserResponse {
-  User user = 1;
+    User user = 1;
 }
 
 message UpdateUsernameRequest {
-  string username = 1;
+    string username = 1;
 }
 
 message UpdateUsernameResponse {
-  User user = 1;
+    User user = 1;
 }
 
 message UpdatePasswordRequest {
-  string old_password = 1;
-  string new_password = 2;
+    string old_password = 1;
+    string new_password = 2;
 }
 
 message UpdatePasswordResponse {}
 
 message AddProfilePictureRequest {
-  string url = 1;
+    string url = 1;
 }
 
 message AddProfilePictureResponse {
-  ProfilePic profile_pic = 1;
+    ProfilePic profile_pic = 1;
 }
 
 message DeleteProfilePictureRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message DeleteProfilePictureResponse {}
 
 message GetProfilePicturesRequest {
-  string user_id = 1;
+    string user_id = 1;
 }
 
 message GetProfilePicturesResponse {
-  repeated ProfilePic profile_pics = 1;
+    repeated ProfilePic profile_pics = 1;
 }
 
 message SetBackgroundPicRequest {
-  string object_key = 1;
+    string object_key = 1;
 }
 
 message SetBackgroundPicResponse {
-  User user = 1;
+    User user = 1;
 }
 
 message GetUserByIDRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message GetUserByIDResponse {
-  User user = 1;
+    User user = 1;
 }
 
 message GetUserByUsernameRequest {
-  string username = 1;
+    string username = 1;
 }
 
 message GetUserByUsernameResponse {
-  User user = 1;
+    User user = 1;
 }
 
 message GetMeRequest {}
 
 message GetMeResponse {
-  User user = 1;
+    User user = 1;
 }

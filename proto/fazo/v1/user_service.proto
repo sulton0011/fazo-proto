@@ -8,58 +8,68 @@ import "google/api/annotations.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 service UserService {
-  rpc GetMe(GetMeRequest) returns (GetMeResponse) {
-    option (google.api.http) = {get: "/v1/users/me"};
-  }
+    rpc GetMe(GetMeRequest) returns (GetMeResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/me"
+        };
+    }
 
-  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
-    option (google.api.http) = {get: "/v1/users/{id}"};
-  }
+    rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{id}"
+        };
+    }
 
-  rpc GetUserByUsername(GetUserByUsernameRequest) returns (GetUserByUsernameResponse) {
-    option (google.api.http) = {get: "/v1/users/username/{username}"};
-  }
+    rpc GetUserByUsername(GetUserByUsernameRequest) returns (GetUserByUsernameResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/username/{username}"
+        };
+    }
 
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
-    option (google.api.http) = {
-      patch: "/v1/users/me"
-      body:  "*"
-    };
-  }
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/me"
+            body: "*"
+        };
+    }
 
-  rpc UpdateUsername(UpdateUsernameRequest) returns (UpdateUsernameResponse) {
-    option (google.api.http) = {
-      patch: "/v1/users/me/username"
-      body:  "*"
-    };
-  }
+    rpc UpdateUsername(UpdateUsernameRequest) returns (UpdateUsernameResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/me/username"
+            body: "*"
+        };
+    }
 
-  rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {
-    option (google.api.http) = {
-      patch: "/v1/users/me/password"
-      body:  "*"
-    };
-  }
+    rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/me/password"
+            body: "*"
+        };
+    }
 
-  rpc GetProfilePictures(GetProfilePicturesRequest) returns (GetProfilePicturesResponse) {
-    option (google.api.http) = {get: "/v1/users/{user_id}/profile-pictures"};
-  }
+    rpc GetProfilePictures(GetProfilePicturesRequest) returns (GetProfilePicturesResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}/profile-pictures"
+        };
+    }
 
-  rpc AddProfilePicture(AddProfilePictureRequest) returns (AddProfilePictureResponse) {
-    option (google.api.http) = {
-      post: "/v1/users/me/profile-pictures"
-      body: "*"
-    };
-  }
+    rpc AddProfilePicture(AddProfilePictureRequest) returns (AddProfilePictureResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/me/profile-pictures"
+            body: "*"
+        };
+    }
 
-  rpc DeleteProfilePicture(DeleteProfilePictureRequest) returns (DeleteProfilePictureResponse) {
-    option (google.api.http) = {delete: "/v1/users/me/profile-pictures/{id}"};
-  }
+    rpc DeleteProfilePicture(DeleteProfilePictureRequest) returns (DeleteProfilePictureResponse) {
+        option (google.api.http) = {
+            delete: "/v1/users/me/profile-pictures/{id}"
+        };
+    }
 
-  rpc SetBackgroundPic(SetBackgroundPicRequest) returns (SetBackgroundPicResponse) {
-    option (google.api.http) = {
-      put: "/v1/users/me/background"
-      body: "*"
-    };
-  }
+    rpc SetBackgroundPic(SetBackgroundPicRequest) returns (SetBackgroundPicResponse) {
+        option (google.api.http) = {
+            put: "/v1/users/me/background"
+            body: "*"
+        };
+    }
 }
