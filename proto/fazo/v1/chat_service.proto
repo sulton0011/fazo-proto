@@ -8,54 +8,64 @@ import "google/api/annotations.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 service ChatService {
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
-    option (google.api.http) = {
-      post: "/v1/messages"
-      body: "*"
-    };
-  }
+    rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+        option (google.api.http) = {
+            post: "/v1/messages"
+            body: "*"
+        };
+    }
 
-  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) {
-    option (google.api.http) = {get: "/v1/messages/{contact_id}"};
-  }
+    rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) {
+        option (google.api.http) = {
+            get: "/v1/messages/{contact_id}"
+        };
+    }
 
-  rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
-    option (google.api.http) = {
-      patch: "/v1/messages/{id}"
-      body:  "*"
-    };
-  }
+    rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
+        option (google.api.http) = {
+            patch: "/v1/messages/{id}"
+            body: "*"
+        };
+    }
 
-  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) {
-    option (google.api.http) = {delete: "/v1/messages/{id}"};
-  }
+    rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) {
+        option (google.api.http) = {
+            delete: "/v1/messages/{id}"
+        };
+    }
 
-  rpc GetChatList(GetChatListRequest) returns (GetChatListResponse) {
-    option (google.api.http) = {get: "/v1/chats"};
-  }
+    rpc GetChatList(GetChatListRequest) returns (GetChatListResponse) {
+        option (google.api.http) = {
+            get: "/v1/chats"
+        };
+    }
 
-  rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse) {
-    option (google.api.http) = {get: "/v1/chats/{contact_id}/unread"};
-  }
+    rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse) {
+        option (google.api.http) = {
+            get: "/v1/chats/{contact_id}/unread"
+        };
+    }
 
-  rpc MarkMessagesAsRead(MarkMessagesAsReadRequest) returns (MarkMessagesAsReadResponse) {
-    option (google.api.http) = {
-      post: "/v1/chats/{contact_id}/read"
-      body: "*"
-    };
-  }
+    rpc MarkMessagesAsRead(MarkMessagesAsReadRequest) returns (MarkMessagesAsReadResponse) {
+        option (google.api.http) = {
+            post: "/v1/chats/{contact_id}/read"
+            body: "*"
+        };
+    }
 
-  rpc SetChatPinned(SetChatPinnedRequest) returns (SetChatPinnedResponse) {
-    option (google.api.http) = {
-      post: "/v1/chats/{contact_id}/pin"
-      body: "*"
-    };
-  }
+    rpc SetChatPinned(SetChatPinnedRequest) returns (SetChatPinnedResponse) {
+        option (google.api.http) = {
+            post: "/v1/chats/{contact_id}/pin"
+            body: "*"
+        };
+    }
 
-  rpc GetPinnedChats(GetPinnedChatsRequest) returns (GetPinnedChatsResponse) {
-    option (google.api.http) = {get: "/v1/chats/pinned"};
-  }
+    rpc GetPinnedChats(GetPinnedChatsRequest) returns (GetPinnedChatsResponse) {
+        option (google.api.http) = {
+            get: "/v1/chats/pinned"
+        };
+    }
 
-  // StreamMessages — real-time messages via server-streaming (ConnectRPC only, no gateway)
-  rpc StreamMessages(StreamMessagesRequest) returns (stream Message);
+    // StreamMessages — real-time messages via server-streaming (ConnectRPC only, no gateway)
+    rpc StreamMessages(StreamMessagesRequest) returns (stream Message);
 }

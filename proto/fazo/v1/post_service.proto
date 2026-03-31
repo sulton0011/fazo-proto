@@ -8,40 +8,48 @@ import "google/api/annotations.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 service PostService {
-  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
-    option (google.api.http) = {
-      post: "/v1/posts"
-      body: "*"
-    };
-  }
+    rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
+        option (google.api.http) = {
+            post: "/v1/posts"
+            body: "*"
+        };
+    }
 
-  rpc GetPost(GetPostRequest) returns (GetPostResponse) {
-    option (google.api.http) = {get: "/v1/posts/{id}"};
-  }
+    rpc GetPost(GetPostRequest) returns (GetPostResponse) {
+        option (google.api.http) = {
+            get: "/v1/posts/{id}"
+        };
+    }
 
-  rpc GetAllPosts(GetAllPostsRequest) returns (GetAllPostsResponse) {
-    option (google.api.http) = {get: "/v1/posts"};
-  }
+    rpc GetAllPosts(GetAllPostsRequest) returns (GetAllPostsResponse) {
+        option (google.api.http) = {
+            get: "/v1/posts"
+        };
+    }
 
-  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
-    option (google.api.http) = {
-      patch: "/v1/posts/{id}"
-      body:  "*"
-    };
-  }
+    rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
+        option (google.api.http) = {
+            patch: "/v1/posts/{id}"
+            body: "*"
+        };
+    }
 
-  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {
-    option (google.api.http) = {delete: "/v1/posts/{id}"};
-  }
+    rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {
+        option (google.api.http) = {
+            delete: "/v1/posts/{id}"
+        };
+    }
 
-  rpc SearchPostsByTitle(SearchPostsByTitleRequest) returns (SearchPostsByTitleResponse) {
-    option (google.api.http) = {get: "/v1/posts/search"};
-  }
+    rpc SearchPostsByTitle(SearchPostsByTitleRequest) returns (SearchPostsByTitleResponse) {
+        option (google.api.http) = {
+            get: "/v1/posts/search"
+        };
+    }
 
-  rpc LikePost(LikePostRequest) returns (LikePostResponse) {
-    option (google.api.http) = {
-      post: "/v1/posts/{id}/like"
-      body: "*"
-    };
-  }
+    rpc LikePost(LikePostRequest) returns (LikePostResponse) {
+        option (google.api.http) = {
+            post: "/v1/posts/{id}/like"
+            body: "*"
+        };
+    }
 }
