@@ -2,25 +2,27 @@ syntax = "proto3";
 
 package fazo.v1;
 
+import "fazo/v1/file_types.proto";
+
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Post {
-    string id                = 1  [json_name = "id"];
-    string creator_id        = 2  [json_name = "creator_id"];
-    string title             = 3  [json_name = "title"];
-    string description       = 4  [json_name = "description"];
-    repeated string pictures = 5  [json_name = "pictures"];
-    repeated string tags     = 6  [json_name = "tags"];
-    int32 likes              = 7  [json_name = "likes"];
-    string reactions         = 8  [json_name = "reactions"];   // JSON string: {"👍":5,"❤️":3}
-    int64 delete_at          = 9  [json_name = "delete_at"];   // 0 = abadiy
-    int64 created_at         = 10 [json_name = "created_at"];
+    string id                        = 1  [json_name = "id"];
+    string creator_id                = 2  [json_name = "creator_id"];
+    string title                     = 3  [json_name = "title"];
+    string description               = 4  [json_name = "description"];
+    repeated FileRecord media        = 5  [json_name = "media"];
+    repeated string tags             = 6  [json_name = "tags"];
+    int32 likes                      = 7  [json_name = "likes"];
+    string reactions                 = 8  [json_name = "reactions"];   // JSON string: {"👍":5,"❤️":3}
+    int64 delete_at                  = 9  [json_name = "delete_at"];   // 0 = abadiy
+    int64 created_at                 = 10 [json_name = "created_at"];
 }
 
 message CreatePostRequest {
     string title             = 1 [json_name = "title"];
     string description       = 2 [json_name = "description"];
-    repeated string pictures = 3 [json_name = "pictures"];
+    repeated string media_ids = 3 [json_name = "media_ids"];  // file_store.id lar
     repeated string tags     = 4 [json_name = "tags"];
     int64 delete_after       = 5 [json_name = "delete_after"];  // seconds from now, 0 = abadiy
 }
@@ -52,8 +54,7 @@ message UpdatePostRequest {
     string id                = 1 [json_name = "id"];
     string title             = 2 [json_name = "title"];
     string description       = 3 [json_name = "description"];
-    repeated string pictures = 4 [json_name = "pictures"];
-    repeated string tags     = 5 [json_name = "tags"];
+    repeated string tags     = 4 [json_name = "tags"];
 }
 
 message UpdatePostResponse {
