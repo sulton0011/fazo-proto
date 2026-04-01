@@ -5,57 +5,57 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message RegisterRequest {
-    string full_name = 1;
-    string username  = 2;
-    string password  = 3;
-    string phone     = 4;  // optional, E.164
+    string full_name = 1 [json_name = "full_name"];
+    string username  = 2 [json_name = "username"];
+    string password  = 3 [json_name = "password"];
+    string phone     = 4 [json_name = "phone"];  // optional, E.164
 }
 
 message RegisterResponse {
-    string access_token  = 1;
-    string refresh_token = 2;
-    User user            = 3;
+    string access_token  = 1 [json_name = "access_token"];
+    string refresh_token = 2 [json_name = "refresh_token"];
+    User user            = 3 [json_name = "user"];
 }
 
 message LoginRequest {
-    string username = 1;
-    string password = 2;
+    string username = 1 [json_name = "username"];
+    string password = 2 [json_name = "password"];
 }
 
 message LoginResponse {
-    string access_token  = 1;
-    string refresh_token = 2;
-    User user            = 3;
+    string access_token  = 1 [json_name = "access_token"];
+    string refresh_token = 2 [json_name = "refresh_token"];
+    User user            = 3 [json_name = "user"];
 }
 
 message RefreshTokenRequest {
-    string refresh_token = 1;
+    string refresh_token = 1 [json_name = "refresh_token"];
 }
 
 message RefreshTokenResponse {
-    string access_token = 1;
+    string access_token = 1 [json_name = "access_token"];
 }
 
 message LogoutRequest {
-    string refresh_token = 1;
+    string refresh_token = 1 [json_name = "refresh_token"];
 }
 
 message LogoutResponse {}
 
 message ProfilePic {
-    string id       = 1;
-    string url      = 2;
-    int64 posted_at = 3;
+    string id       = 1 [json_name = "id"];
+    string url      = 2 [json_name = "url"];
+    int64 posted_at = 3 [json_name = "posted_at"];
 }
 
 message User {
-    string id                        = 1;
-    string full_name                 = 2;
-    string username                  = 3;
-    string phone                     = 4;
-    string bio                       = 5;
-    bool profile_hidden              = 6;
-    string background_pic            = 7;
-    int64 created_at                 = 8;
-    repeated ProfilePic profile_pics = 9;
+    string id                        = 1 [json_name = "id"];
+    string full_name                 = 2 [json_name = "full_name"];
+    string username                  = 3 [json_name = "username"];
+    string phone                     = 4 [json_name = "phone"];
+    string bio                       = 5 [json_name = "bio"];
+    bool profile_hidden              = 6 [json_name = "profile_hidden"];
+    string background_pic            = 7 [json_name = "background_pic"];
+    int64 created_at                 = 8 [json_name = "created_at"];
+    repeated ProfilePic profile_pics = 9 [json_name = "profile_pics"];
 }

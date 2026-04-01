@@ -63,14 +63,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
 };
 
-// ErrorResponse is the top-level error envelope returned by the API.
-// Example: {"error": {"code": "InvalidArgument", "message": "password must be at least 8 characters"}}
 message ErrorResponse {
-    ErrorDetail error = 1;
+    ErrorDetail error = 1 [json_name = "error"];
 }
 
-// ErrorDetail contains the error code and human-readable message.
 message ErrorDetail {
-    string code    = 1;
-    string message = 2;
+    string code    = 1 [json_name = "code"];
+    string message = 2 [json_name = "message"];
 }

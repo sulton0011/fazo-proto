@@ -5,81 +5,81 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Post {
-    string id                = 1;
-    string creator_id        = 2;
-    string title             = 3;
-    string description       = 4;
-    repeated string pictures = 5;
-    repeated string tags     = 6;
-    int32 likes              = 7;
-    string reactions         = 8;  // JSON string: {"👍":5,"❤️":3}
-    int64 delete_at          = 9;  // 0 = abadiy
-    int64 created_at         = 10;
+    string id                = 1  [json_name = "id"];
+    string creator_id        = 2  [json_name = "creator_id"];
+    string title             = 3  [json_name = "title"];
+    string description       = 4  [json_name = "description"];
+    repeated string pictures = 5  [json_name = "pictures"];
+    repeated string tags     = 6  [json_name = "tags"];
+    int32 likes              = 7  [json_name = "likes"];
+    string reactions         = 8  [json_name = "reactions"];   // JSON string: {"👍":5,"❤️":3}
+    int64 delete_at          = 9  [json_name = "delete_at"];   // 0 = abadiy
+    int64 created_at         = 10 [json_name = "created_at"];
 }
 
 message CreatePostRequest {
-    string title             = 1;
-    string description       = 2;
-    repeated string pictures = 3;
-    repeated string tags     = 4;
-    int64 delete_after       = 5;  // seconds from now, 0 = abadiy
+    string title             = 1 [json_name = "title"];
+    string description       = 2 [json_name = "description"];
+    repeated string pictures = 3 [json_name = "pictures"];
+    repeated string tags     = 4 [json_name = "tags"];
+    int64 delete_after       = 5 [json_name = "delete_after"];  // seconds from now, 0 = abadiy
 }
 
 message CreatePostResponse {
-    Post post = 1;
+    Post post = 1 [json_name = "post"];
 }
 
 message GetPostRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message GetPostResponse {
-    Post post = 1;
+    Post post = 1 [json_name = "post"];
 }
 
 message GetAllPostsRequest {
-    string cursor   = 1;  // ULID, optional — cursor-based pagination
-    int32 page_size = 2;  // default 20, max 50
+    string cursor   = 1 [json_name = "cursor"];     // ULID, optional — cursor-based pagination
+    int32 page_size = 2 [json_name = "page_size"];   // default 20, max 50
 }
 
 message GetAllPostsResponse {
-    repeated Post posts = 1;
-    string next_cursor  = 2;
-    bool has_more       = 3;
+    repeated Post posts = 1 [json_name = "posts"];
+    string next_cursor  = 2 [json_name = "next_cursor"];
+    bool has_more       = 3 [json_name = "has_more"];
 }
 
 message UpdatePostRequest {
-    string id                = 1;
-    string title             = 2;
-    string description       = 3;
-    repeated string pictures = 4;
-    repeated string tags     = 5;
+    string id                = 1 [json_name = "id"];
+    string title             = 2 [json_name = "title"];
+    string description       = 3 [json_name = "description"];
+    repeated string pictures = 4 [json_name = "pictures"];
+    repeated string tags     = 5 [json_name = "tags"];
 }
 
 message UpdatePostResponse {
-    Post post = 1;
+    Post post = 1 [json_name = "post"];
 }
 
 message DeletePostRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message DeletePostResponse {}
 
 message SearchPostsByTitleRequest {
-    string query    = 1;
-    int32 page_size = 2;  // default 20
+    string query    = 1 [json_name = "query"];
+    int32 page_size = 2 [json_name = "page_size"];  // default 20
 }
 
 message SearchPostsByTitleResponse {
-    repeated Post posts = 1;
+    repeated Post posts = 1 [json_name = "posts"];
 }
 
 message LikePostRequest {
-    string id  = 1;
-    bool liked = 2;  // true = +1, false = -1
+    string id  = 1 [json_name = "id"];
+    bool liked = 2 [json_name = "liked"];  // true = +1, false = -1
 }
 
 message LikePostResponse {
-    Post post = 1;
+    Post post = 1 [json_name = "post"];
 }

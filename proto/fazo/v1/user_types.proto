@@ -7,78 +7,78 @@ import "fazo/v1/auth_types.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message UpdateUserRequest {
-    string full_name = 1;
-    string bio       = 2;
-    string phone     = 3;  // optional, E.164
+    string full_name = 1 [json_name = "full_name"];
+    string bio       = 2 [json_name = "bio"];
+    string phone     = 3 [json_name = "phone"];  // optional, E.164
 }
 
 message UpdateUserResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }
 
 message UpdateUsernameRequest {
-    string username = 1;
+    string username = 1 [json_name = "username"];
 }
 
 message UpdateUsernameResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }
 
 message UpdatePasswordRequest {
-    string old_password = 1;
-    string new_password = 2;
+    string old_password = 1 [json_name = "old_password"];
+    string new_password = 2 [json_name = "new_password"];
 }
 
 message UpdatePasswordResponse {}
 
 message AddProfilePictureRequest {
-    string url = 1;
+    string url = 1 [json_name = "url"];
 }
 
 message AddProfilePictureResponse {
-    ProfilePic profile_pic = 1;
+    ProfilePic profile_pic = 1 [json_name = "profile_pic"];
 }
 
 message DeleteProfilePictureRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message DeleteProfilePictureResponse {}
 
 message GetProfilePicturesRequest {
-    string user_id = 1;
+    string user_id = 1 [json_name = "user_id"];
 }
 
 message GetProfilePicturesResponse {
-    repeated ProfilePic profile_pics = 1;
+    repeated ProfilePic profile_pics = 1 [json_name = "profile_pics"];
 }
 
 message SetBackgroundPicRequest {
-    string object_key = 1;
+    string object_key = 1 [json_name = "object_key"];
 }
 
 message SetBackgroundPicResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }
 
 message GetUserByIDRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message GetUserByIDResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }
 
 message GetUserByUsernameRequest {
-    string username = 1;
+    string username = 1 [json_name = "username"];
 }
 
 message GetUserByUsernameResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }
 
 message GetMeRequest {}
 
 message GetMeResponse {
-    User user = 1;
+    User user = 1 [json_name = "user"];
 }

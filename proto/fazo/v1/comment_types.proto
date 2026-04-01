@@ -5,69 +5,69 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Comment {
-    string id                      = 1;
-    string post_id                 = 2;
-    string user_id                 = 3;
-    string text                    = 4;
-    repeated string images         = 5;
-    repeated string videos         = 6;
-    repeated string voice_messages = 7;
-    string reply_to                = 8;  // empty = top-level
-    string reactions               = 9;  // JSON string: {"👍":["user_id1",...]}
-    int64 created_at               = 10;
+    string id                      = 1  [json_name = "id"];
+    string post_id                 = 2  [json_name = "post_id"];
+    string user_id                 = 3  [json_name = "user_id"];
+    string text                    = 4  [json_name = "text"];
+    repeated string images         = 5  [json_name = "images"];
+    repeated string videos         = 6  [json_name = "videos"];
+    repeated string voice_messages = 7  [json_name = "voice_messages"];
+    string reply_to                = 8  [json_name = "reply_to"];    // empty = top-level
+    string reactions               = 9  [json_name = "reactions"];   // JSON string: {"👍":["user_id1",...]}
+    int64 created_at               = 10 [json_name = "created_at"];
 }
 
 message CreateCommentRequest {
-    string post_id                 = 1;
-    string text                    = 2;
-    repeated string images         = 3;
-    repeated string videos         = 4;
-    repeated string voice_messages = 5;
-    string reply_to                = 6;  // optional
+    string post_id                 = 1 [json_name = "post_id"];
+    string text                    = 2 [json_name = "text"];
+    repeated string images         = 3 [json_name = "images"];
+    repeated string videos         = 4 [json_name = "videos"];
+    repeated string voice_messages = 5 [json_name = "voice_messages"];
+    string reply_to                = 6 [json_name = "reply_to"];  // optional
 }
 
 message CreateCommentResponse {
-    Comment comment = 1;
+    Comment comment = 1 [json_name = "comment"];
 }
 
 message GetCommentsRequest {
-    string post_id  = 1;
-    int32 page      = 2;  // offset-based, 1-indexed
-    int32 page_size = 3;  // default 20
+    string post_id  = 1 [json_name = "post_id"];
+    int32 page      = 2 [json_name = "page"];       // offset-based, 1-indexed
+    int32 page_size = 3 [json_name = "page_size"];   // default 20
 }
 
 message GetCommentsResponse {
-    repeated Comment comments = 1;
-    int32 total               = 2;
+    repeated Comment comments = 1 [json_name = "comments"];
+    int32 total               = 2 [json_name = "total"];
 }
 
 message UpdateCommentRequest {
-    string id                      = 1;
-    string text                    = 2;
-    repeated string images         = 3;
-    repeated string videos         = 4;
-    repeated string voice_messages = 5;
+    string id                      = 1 [json_name = "id"];
+    string text                    = 2 [json_name = "text"];
+    repeated string images         = 3 [json_name = "images"];
+    repeated string videos         = 4 [json_name = "videos"];
+    repeated string voice_messages = 5 [json_name = "voice_messages"];
 }
 
 message UpdateCommentResponse {
-    Comment comment = 1;
+    Comment comment = 1 [json_name = "comment"];
 }
 
 message DeleteCommentRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message DeleteCommentResponse {}
 
 message ReactToCommentRequest {
-    string id        = 1;
-    string reactions = 2;  // JSON string: {"👍":["user_id1",...]}
+    string id        = 1 [json_name = "id"];
+    string reactions = 2 [json_name = "reactions"];  // JSON string: {"👍":["user_id1",...]}
 }
 
 message ReactToCommentResponse {
-    Comment comment = 1;
+    Comment comment = 1 [json_name = "comment"];
 }
 
 message StreamCommentsRequest {
-    string post_id = 1;
+    string post_id = 1 [json_name = "post_id"];
 }

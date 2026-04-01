@@ -5,48 +5,48 @@ package fazo.v1;
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Background {
-    string id            = 1;
-    string uploader_id   = 2;
-    string object_key    = 3;
-    string thumbnail_key = 4;
-    int64 original_size  = 5;
-    int64 thumbnail_size = 6;
-    string content_type  = 7;
-    int32 width          = 8;
-    int32 height         = 9;
-    int64 created_at     = 10;
+    string id            = 1  [json_name = "id"];
+    string uploader_id   = 2  [json_name = "uploader_id"];
+    string object_key    = 3  [json_name = "object_key"];
+    string thumbnail_key = 4  [json_name = "thumbnail_key"];
+    int64 original_size  = 5  [json_name = "original_size"];
+    int64 thumbnail_size = 6  [json_name = "thumbnail_size"];
+    string content_type  = 7  [json_name = "content_type"];
+    int32 width          = 8  [json_name = "width"];
+    int32 height         = 9  [json_name = "height"];
+    int64 created_at     = 10 [json_name = "created_at"];
 }
 
 message CreateBackgroundRequest {
-    string object_key    = 1;
-    string thumbnail_key = 2;
-    int64 original_size  = 3;
-    int64 thumbnail_size = 4;
-    string content_type  = 5;
-    int32 width          = 6;
-    int32 height         = 7;
+    string object_key    = 1 [json_name = "object_key"];
+    string thumbnail_key = 2 [json_name = "thumbnail_key"];
+    int64 original_size  = 3 [json_name = "original_size"];
+    int64 thumbnail_size = 4 [json_name = "thumbnail_size"];
+    string content_type  = 5 [json_name = "content_type"];
+    int32 width          = 6 [json_name = "width"];
+    int32 height         = 7 [json_name = "height"];
 }
 
 message CreateBackgroundResponse {
-    Background background = 1;
+    Background background = 1 [json_name = "background"];
 }
 
 message GetAllBackgroundsRequest {}
 
 message GetAllBackgroundsResponse {
-    repeated Background backgrounds = 1;
+    repeated Background backgrounds = 1 [json_name = "backgrounds"];
 }
 
 message GetBackgroundByIDRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message GetBackgroundByIDResponse {
-    Background background = 1;
+    Background background = 1 [json_name = "background"];
 }
 
 message DeleteBackgroundRequest {
-    string id = 1;
+    string id = 1 [json_name = "id"];
 }
 
 message DeleteBackgroundResponse {}
