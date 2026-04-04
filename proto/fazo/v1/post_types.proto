@@ -25,6 +25,7 @@ message CreatePostRequest {
     repeated string media_ids = 3 [json_name = "media_ids"];  // file_store.id lar
     repeated string tags     = 4 [json_name = "tags"];
     int64 delete_after       = 5 [json_name = "delete_after"];  // seconds from now, 0 = abadiy
+    string id                = 6 [json_name = "id"];            // optional: client ULID, bo'sh bo'lsa server generatsiya qiladi
 }
 
 message CreatePostResponse {
