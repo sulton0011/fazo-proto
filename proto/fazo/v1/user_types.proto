@@ -82,3 +82,23 @@ message GetMeRequest {}
 message GetMeResponse {
     User user = 1 [json_name = "user"];
 }
+
+enum UserSortBy {
+    SORT_BY_UNSPECIFIED = 0;
+    SORT_BY_CREATED_AT  = 1;
+    SORT_BY_USERNAME    = 2;
+    SORT_BY_FULL_NAME   = 3;
+}
+
+message GetAllUsersRequest {
+    string cursor       = 1 [json_name = "cursor"];      // ULID, optional
+    int32 page_size     = 2 [json_name = "page_size"];   // default 20, max 50
+    string search       = 3 [json_name = "search"];      // ILIKE on full_name + username
+    UserSortBy sort_by  = 4 [json_name = "sort_by"];     // 0 = created_at DESC
+}
+
+message GetAllUsersResponse {
+    repeated User users = 1 [json_name = "users"];
+    string next_cursor  = 2 [json_name = "next_cursor"];
+    bool has_more       = 3 [json_name = "has_more"];
+}

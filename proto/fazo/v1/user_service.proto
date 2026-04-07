@@ -14,6 +14,12 @@ service UserService {
         };
     }
 
+    rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse) {
+        option (google.api.http) = {
+            get: "/v1/users"
+        };
+    }
+
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/v1/users/{id}"

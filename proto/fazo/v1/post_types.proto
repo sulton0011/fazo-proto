@@ -6,6 +6,13 @@ import "fazo/v1/file_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
+enum PostType {
+    POST_TYPE_UNSPECIFIED  = 0;
+    POST_TYPE_GLOBAL_CHAT  = 1;
+    POST_TYPE_SHOP_CHAT    = 2;
+    POST_TYPE_MEDIA_CHAT   = 3;
+}
+
 message Post {
     string id                        = 1  [json_name = "id"];
     string creator_id                = 2  [json_name = "creator_id"];
@@ -17,15 +24,21 @@ message Post {
     string reactions                 = 8  [json_name = "reactions"];   // JSON string: {"👍":5,"❤️":3}
     int64 delete_at                  = 9  [json_name = "delete_at"];   // 0 = abadiy
     int64 created_at                 = 10 [json_name = "created_at"];
+    PostType type                    = 11 [json_name = "type"];
+    bool is_public                   = 12 [json_name = "is_public"];
+    int64 price                      = 13 [json_name = "price"];       // so'm birligida
 }
 
 message CreatePostRequest {
-    string title             = 1 [json_name = "title"];
-    string description       = 2 [json_name = "description"];
+    string title              = 1 [json_name = "title"];
+    string description        = 2 [json_name = "description"];
     repeated string media_ids = 3 [json_name = "media_ids"];  // file_store.id lar
-    repeated string tags     = 4 [json_name = "tags"];
-    int64 delete_after       = 5 [json_name = "delete_after"];  // seconds from now, 0 = abadiy
-    string id                = 6 [json_name = "id"];            // optional: client ULID, bo'sh bo'lsa server generatsiya qiladi
+    repeated string tags      = 4 [json_name = "tags"];
+    int64 delete_after        = 5 [json_name = "delete_after"];  // seconds from now, 0 = abadiy
+    string id                 = 6 [json_name = "id"];            // optional: client ULID, bo'sh bo'lsa server generatsiya qiladi
+    PostType type             = 7 [json_name = "type"];          // default: POST_TYPE_GLOBAL_CHAT
+    optional bool is_public   = 8 [json_name = "is_public"];          // null = default true, false = private
+    int64 price               = 9 [json_name = "price"];              // shop_chat da majburiy (> 0)
 }
 
 message CreatePostResponse {
@@ -41,8 +54,12 @@ message GetPostResponse {
 }
 
 message GetAllPostsRequest {
-    string cursor   = 1 [json_name = "cursor"];     // ULID, optional — cursor-based pagination
-    int32 page_size = 2 [json_name = "page_size"];   // default 20, max 50
+    string cursor       = 1 [json_name = "cursor"];      // ULID, optional — cursor-based pagination
+    int32 page_size     = 2 [json_name = "page_size"];   // default 20, max 50
+    string search       = 3 [json_name = "search"];      // ILIKE '%search%' on title+tags
+    PostType type       = 4 [json_name = "type"];        // 0 = filter yo'q
+    optional bool is_public  = 5 [json_name = "is_public"];  // null = hammasi, true = public, false = private
+    string created_by   = 6 [json_name = "created_by"];  // user ID, bo'sh = hammasi
 }
 
 message GetAllPostsResponse {
@@ -56,6 +73,8 @@ message UpdatePostRequest {
     string title             = 2 [json_name = "title"];
     string description       = 3 [json_name = "description"];
     repeated string tags     = 4 [json_name = "tags"];
+    optional bool is_public  = 5 [json_name = "is_public"];   // null = o'zgartirmaslik
+    int64 price              = 6 [json_name = "price"];
 }
 
 message UpdatePostResponse {
@@ -67,15 +86,6 @@ message DeletePostRequest {
 }
 
 message DeletePostResponse {}
-
-message SearchPostsByTitleRequest {
-    string query    = 1 [json_name = "query"];
-    int32 page_size = 2 [json_name = "page_size"];  // default 20
-}
-
-message SearchPostsByTitleResponse {
-    repeated Post posts = 1 [json_name = "posts"];
-}
 
 message LikePostRequest {
     string id  = 1 [json_name = "id"];

@@ -40,12 +40,6 @@ service PostService {
         };
     }
 
-    rpc SearchPostsByTitle(SearchPostsByTitleRequest) returns (SearchPostsByTitleResponse) {
-        option (google.api.http) = {
-            get: "/v1/posts/search"
-        };
-    }
-
     rpc LikePost(LikePostRequest) returns (LikePostResponse) {
         option (google.api.http) = {
             post: "/v1/posts/{id}/like"
