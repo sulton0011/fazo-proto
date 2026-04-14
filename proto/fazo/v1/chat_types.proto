@@ -20,6 +20,7 @@ message Message {
     repeated string voice_messages = 7 [json_name = "voice_messages"];
     int64 created_at               = 8 [json_name = "created_at"];
     optional Location location     = 9 [json_name = "location"];
+    bool is_read                   = 10 [json_name = "is_read"];
 }
 
 message ChatSummary {
@@ -93,7 +94,8 @@ message GetUnreadCountResponse {
 }
 
 message MarkMessagesAsReadRequest {
-    string contact_id = 1 [json_name = "contact_id"];
+    string          contact_id  = 1 [json_name = "contact_id"];
+    repeated string message_ids = 2 [json_name = "message_ids"];
 }
 
 message MarkMessagesAsReadResponse {}
@@ -114,3 +116,41 @@ message GetPinnedChatsResponse {
 message StreamMessagesRequest {
     string contact_id = 1 [json_name = "contact_id"];  // empty = listen to all incoming messages
 }
+
+// EditEvent — xabar tahrirlandi
+message EditEvent {
+    Message updated_message = 1 [json_name = "updated_message"];
+}
+
+// DeleteEvent — xabar o'chirildi
+message DeleteEvent {
+    string message_id = 1 [json_name = "message_id"];
+    string sender_id  = 2 [json_name = "sender_id"];
+}
+
+// ReadReceipt — xabar o'qildi bildirishi
+message ReadReceipt {
+    string reader_id   = 1 [json_name = "reader_id"];
+    string contact_id  = 2 [json_name = "contact_id"];
+    int64 last_read_at = 3 [json_name = "last_read_at"];
+}
+
+// ChatEvent — StreamMessages orqali keladigan barcha event tiplari
+message ChatEvent {
+    oneof event {
+        Message     message      = 1;
+        EditEvent   edit_event   = 2;
+        DeleteEvent delete_event = 3;
+        ReadReceipt read_receipt = 4;
+    }
+}
+
+// ChatListUpdate — StreamChatList orqali chat ro'yxati yangilanishi
+message ChatListUpdate {
+    string  contact_id   = 1 [json_name = "contact_id"];
+    Message last_message = 2 [json_name = "last_message"];
+    int64   unread_count = 3 [json_name = "unread_count"];
+}
+
+// StreamChatListRequest — filter yo'q, barcha chatlardan update keladi
+message StreamChatListRequest {}

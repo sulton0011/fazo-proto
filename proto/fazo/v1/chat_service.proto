@@ -66,6 +66,9 @@ service ChatService {
         };
     }
 
-    // StreamMessages — real-time messages via server-streaming (ConnectRPC only, no gateway)
-    rpc StreamMessages(StreamMessagesRequest) returns (stream Message);
+    // StreamMessages — real-time chat events via server-streaming (ConnectRPC only, no gateway)
+    rpc StreamMessages(StreamMessagesRequest) returns (stream ChatEvent);
+
+    // StreamChatList — real-time chat list updates (ConnectRPC only, no gateway)
+    rpc StreamChatList(StreamChatListRequest) returns (stream ChatListUpdate);
 }
