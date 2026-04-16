@@ -3,6 +3,7 @@ syntax = "proto3";
 package fazo.v1;
 
 import "fazo/v1/post_types.proto";
+import "fazo/v1/post_access_request_types.proto";
 import "google/api/annotations.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
@@ -44,6 +45,32 @@ service PostService {
         option (google.api.http) = {
             post: "/v1/posts/{id}/like"
             body: "*"
+        };
+    }
+
+    rpc RequestPostAccess(RequestPostAccessRequest) returns (RequestPostAccessResponse) {
+        option (google.api.http) = {
+            post: "/v1/posts/{post_id}/access-requests"
+            body: "*"
+        };
+    }
+
+    rpc RespondToAccessRequest(RespondToAccessRequestRequest) returns (RespondToAccessRequestResponse) {
+        option (google.api.http) = {
+            patch: "/v1/posts/access-requests"
+            body: "*"
+        };
+    }
+
+    rpc GetPostAccessRequests(GetPostAccessRequestsRequest) returns (GetPostAccessRequestsResponse) {
+        option (google.api.http) = {
+            get: "/v1/posts/{post_id}/access-requests"
+        };
+    }
+
+    rpc GetMyAccessRequests(GetMyAccessRequestsRequest) returns (GetMyAccessRequestsResponse) {
+        option (google.api.http) = {
+            get: "/v1/posts/access-requests/my"
         };
     }
 }

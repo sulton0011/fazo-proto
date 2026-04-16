@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+enum AccessStatus {
+    ACCESS_STATUS_UNSPECIFIED = 0;
+    ACCESS_STATUS_NONE        = 1;
+    ACCESS_STATUS_PENDING     = 2;
+    ACCESS_STATUS_ACCEPTED    = 3;
+    ACCESS_STATUS_REJECTED    = 4;
+}
+
+message PostAccessRequest {
+    string id           = 1 [json_name = "id"];
+    string post_id      = 2 [json_name = "post_id"];
+    string requester_id = 3 [json_name = "requester_id"];
+    string username     = 4 [json_name = "username"];
+    string full_name    = 5 [json_name = "full_name"];
+    string status       = 6 [json_name = "status"];  // pending | accepted | rejected
+    int64  created_at   = 7 [json_name = "created_at"];
+    int64  updated_at   = 8 [json_name = "updated_at"];
+}
+
+// RequestPostAccess
+
+message RequestPostAccessRequest {
+    string post_id = 1 [json_name = "post_id"];
+}
+
+message RequestPostAccessResponse {
+    string request_id = 1 [json_name = "request_id"];
+}
+
+// RespondToAccessRequest — single, batch, or all-pending
+
+message RespondToAccessRequestRequest {
+    // Exactly one of request_id, request_ids, or post_id must be set.
+    string          request_id  = 1 [json_name = "request_id"];   // single mode
+    repeated string request_ids = 2 [json_name = "request_ids"];  // batch mode
+    string          post_id     = 3 [json_name = "post_id"];      // all-pending mode
+
+    string action = 4 [json_name = "action"];  // "accepted" | "rejected" | "accept_all" | "reject_all"
+}
+
+message RespondToAccessRequestResponse {
+    repeated string succeeded_ids = 1 [json_name = "succeeded_ids"];
+    repeated string failed_ids    = 2 [json_name = "failed_ids"];
+}
+
+// GetPostAccessRequests — creator views requests on their post
+
+message GetPostAccessRequestsRequest {
+    string post_id      = 1 [json_name = "post_id"];
+    string status       = 2 [json_name = "status"];     // filter: pending | accepted | rejected | "" = all
+    int64  cursor       = 3 [json_name = "cursor"];     // created_at of last item, 0 = from start
+    int32  page_size    = 4 [json_name = "page_size"];  // default 20, max 50
+}
+
+message GetPostAccessRequestsResponse {
+    repeated PostAccessRequest requests = 1 [json_name = "requests"];
+    int64 next_cursor                   = 2 [json_name = "next_cursor"];
+    bool  has_more                      = 3 [json_name = "has_more"];
+}
+
+// GetMyAccessRequests — requester views their own sent requests
+
+message GetMyAccessRequestsRequest {
+    string status    = 1 [json_name = "status"];     // filter: pending | accepted | rejected | "" = all
+    int64  cursor    = 2 [json_name = "cursor"];     // created_at of last item, 0 = from start
+    int32  page_size = 3 [json_name = "page_size"];  // default 20, max 50
+}
+
+message GetMyAccessRequestsResponse {
+    repeated PostAccessRequest requests = 1 [json_name = "requests"];
+    int64 next_cursor                   = 2 [json_name = "next_cursor"];
+    bool  has_more                      = 3 [json_name = "has_more"];
+}
+
+// Access request stream events
+
+message AccessRequestReceivedEvent {
+    string request_id  = 1 [json_name = "request_id"];
+    string post_id     = 2 [json_name = "post_id"];
+    string requester_id = 3 [json_name = "requester_id"];
+    string username    = 4 [json_name = "username"];
+    string full_name   = 5 [json_name = "full_name"];
+    int64  created_at  = 6 [json_name = "created_at"];
+}
+
+// PostAccessDeniedDetail — GetPost PermissionDenied error detail
+message PostAccessDeniedDetail {
+    AccessStatus access_status = 1 [json_name = "access_status"];
+}
+
+message AccessRequestRespondedEvent {
+    string request_id = 1 [json_name = "request_id"];
+    string post_id    = 2 [json_name = "post_id"];
+    string status     = 3 [json_name = "status"];  // accepted | rejected
+    int64  updated_at = 4 [json_name = "updated_at"];
+}

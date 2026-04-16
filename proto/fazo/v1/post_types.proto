@@ -3,6 +3,7 @@ syntax = "proto3";
 package fazo.v1;
 
 import "fazo/v1/file_types.proto";
+import "fazo/v1/post_access_request_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
@@ -27,6 +28,7 @@ message Post {
     PostType type                    = 11 [json_name = "type"];
     bool is_public                   = 12 [json_name = "is_public"];
     int64 price                      = 13 [json_name = "price"];       // so'm birligida
+    AccessStatus access_status       = 14 [json_name = "access_status"]; // privat postlar uchun: NONE/PENDING/ACCEPTED/REJECTED; public postlarda UNSPECIFIED
 }
 
 message CreatePostRequest {
