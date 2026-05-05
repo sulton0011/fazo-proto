@@ -35,4 +35,11 @@ service AuthService {
             body: "*"
         };
     }
+
+    rpc UpdateDeviceToken(UpdateDeviceTokenRequest) returns (UpdateDeviceTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/device-token"
+            body: "*"
+        };
+    }
 }

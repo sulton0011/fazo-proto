@@ -18,8 +18,10 @@ message RegisterResponse {
 }
 
 message LoginRequest {
-    string username = 1 [json_name = "username"];
-    string password = 2 [json_name = "password"];
+    string username  = 1 [json_name = "username"];
+    string password  = 2 [json_name = "password"];
+    string fcm_token = 3 [json_name = "fcm_token"];  // optional
+    string platform  = 4 [json_name = "platform"];   // optional: ios|android|web
 }
 
 message LoginResponse {
@@ -30,7 +32,17 @@ message LoginResponse {
 
 message RefreshTokenRequest {
     string refresh_token = 1 [json_name = "refresh_token"];
+    string fcm_token     = 2 [json_name = "fcm_token"];  // optional
+    string platform      = 3 [json_name = "platform"];   // optional: ios|android|web
 }
+
+message UpdateDeviceTokenRequest {
+    string refresh_token = 1 [json_name = "refresh_token"];
+    string fcm_token     = 2 [json_name = "fcm_token"];
+    string platform      = 3 [json_name = "platform"];  // ios|android|web
+}
+
+message UpdateDeviceTokenResponse {}
 
 message RefreshTokenResponse {
     string access_token = 1 [json_name = "access_token"];
