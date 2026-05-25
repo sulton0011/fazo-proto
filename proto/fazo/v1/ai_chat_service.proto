@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/ai_chat_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+service AIChatService {
+    rpc CreateConversation(CreateAIConversationRequest) returns (CreateAIConversationResponse) {
+        option (google.api.http) = {
+            post: "/v1/ai/conversations"
+            body: "*"
+        };
+    }
+
+    rpc ListConversations(ListAIConversationsRequest) returns (ListAIConversationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/ai/conversations"
+        };
+    }
+
+    rpc GetConversation(GetAIConversationRequest) returns (GetAIConversationResponse) {
+        option (google.api.http) = {
+            get: "/v1/ai/conversations/{id}"
+        };
+    }
+
+    rpc DeleteConversation(DeleteAIConversationRequest) returns (DeleteAIConversationResponse) {
+        option (google.api.http) = {
+            delete: "/v1/ai/conversations/{id}"
+        };
+    }
+
+    rpc ListMessages(ListAIMessagesRequest) returns (ListAIMessagesResponse) {
+        option (google.api.http) = {
+            get: "/v1/ai/conversations/{conversation_id}/messages"
+        };
+    }
+
+    // SendMessage — Groq dan token-token oqim. ConnectRPC only (no gateway).
+    rpc SendMessage(SendAIMessageRequest) returns (stream AIMessageChunk);
+}

@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// MessageRole — AI suhbatdagi xabar muallifi.
+enum MessageRole {
+    MESSAGE_ROLE_UNSPECIFIED = 0;
+    MESSAGE_ROLE_USER        = 1;
+    MESSAGE_ROLE_ASSISTANT   = 2;
+    MESSAGE_ROLE_SYSTEM      = 3;
+}
+
+message AIConversation {
+    string id         = 1 [json_name = "id"];
+    string user_id    = 2 [json_name = "user_id"];
+    string title      = 3 [json_name = "title"];
+    int64  created_at = 4 [json_name = "created_at"];
+    int64  updated_at = 5 [json_name = "updated_at"];
+}
+
+message AIMessage {
+    string      id              = 1 [json_name = "id"];
+    string      conversation_id = 2 [json_name = "conversation_id"];
+    MessageRole role            = 3 [json_name = "role"];
+    string      content         = 4 [json_name = "content"];
+    string      finish_reason   = 5 [json_name = "finish_reason"];
+    int64       created_at      = 6 [json_name = "created_at"];
+}
+
+message CreateAIConversationRequest {
+    string title = 1 [json_name = "title"];
+}
+
+message CreateAIConversationResponse {
+    AIConversation conversation = 1 [json_name = "conversation"];
+}
+
+message ListAIConversationsRequest {
+    int32  page_size = 1 [json_name = "page_size"];
+    string cursor    = 2 [json_name = "cursor"];
+}
+
+message ListAIConversationsResponse {
+    repeated AIConversation conversations = 1 [json_name = "conversations"];
+    string                  next_cursor   = 2 [json_name = "next_cursor"];
+}
+
+message GetAIConversationRequest {
+    string id = 1 [json_name = "id"];
+}
+
+message GetAIConversationResponse {
+    AIConversation conversation = 1 [json_name = "conversation"];
+}
+
+message DeleteAIConversationRequest {
+    string id = 1 [json_name = "id"];
+}
+
+message DeleteAIConversationResponse {}
+
+message ListAIMessagesRequest {
+    string conversation_id = 1 [json_name = "conversation_id"];
+    int32  page_size       = 2 [json_name = "page_size"];
+    string cursor          = 3 [json_name = "cursor"];
+}
+
+message ListAIMessagesResponse {
+    repeated AIMessage messages    = 1 [json_name = "messages"];
+    string             next_cursor = 2 [json_name = "next_cursor"];
+}
+
+message SendAIMessageRequest {
+    string conversation_id = 1 [json_name = "conversation_id"];
+    string content         = 2 [json_name = "content"];
+}
+
+// AIMessageChunk — server-streaming javobning bitta bo'lagi.
+// Birinchi chunkda yangi suhbat yaratilgan bo'lsa `conversation_id` to'ldiriladi.
+// Oxirgi chunkda `done=true` va `message_id`, `finish_reason` to'ldiriladi.
+message AIMessageChunk {
+    string conversation_id = 1 [json_name = "conversation_id"];
+    string delta           = 2 [json_name = "delta"];
+    bool   done            = 3 [json_name = "done"];
+    string message_id      = 4 [json_name = "message_id"];
+    string finish_reason   = 5 [json_name = "finish_reason"];
+}
