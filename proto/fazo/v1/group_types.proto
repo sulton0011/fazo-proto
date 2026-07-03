@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/chat_types.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// GroupPermissions — granular admin ruxsat bayroqlari (Telegram uslubi).
+// Owner uchun barcha bayroqlar implicit true (DB da saqlanmaydi).
+message GroupPermissions {
+    bool change_info        = 1 [json_name = "change_info"];
+    bool delete_messages    = 2 [json_name = "delete_messages"];
+    bool ban_users          = 3 [json_name = "ban_users"];
+    bool invite_users       = 4 [json_name = "invite_users"];
+    bool manage_video_chats = 5 [json_name = "manage_video_chats"];
+    bool pin_messages       = 6 [json_name = "pin_messages"];
+    bool is_anonymous       = 7 [json_name = "is_anonymous"];
+    bool add_admins         = 8 [json_name = "add_admins"];
+}
+
+message Group {
+    string id          = 1 [json_name = "id"];
+    string name        = 2 [json_name = "name"];
+    string description  = 3 [json_name = "description"];
+    string avatar      = 4 [json_name = "avatar"];
+    string owner_id    = 5 [json_name = "owner_id"];
+    int64 created_at   = 6 [json_name = "created_at"];
+    int64 updated_at   = 7 [json_name = "updated_at"];
+}
+
+message GroupMember {
+    string group_id             = 1 [json_name = "group_id"];
+    string user_id              = 2 [json_name = "user_id"];
+    string role                 = 3 [json_name = "role"];         // owner | admin | member
+    GroupPermissions permissions = 4 [json_name = "permissions"];
+    int64 joined_at             = 5 [json_name = "joined_at"];
+}
+
+message GroupMessage {
+    string id                      = 1 [json_name = "id"];
+    string group_id                = 2 [json_name = "group_id"];
+    string sender_id               = 3 [json_name = "sender_id"];
+    string content                 = 4 [json_name = "content"];
+    repeated string images         = 5 [json_name = "images"];
+    repeated string videos         = 6 [json_name = "videos"];
+    repeated string voice_messages = 7 [json_name = "voice_messages"];
+    optional Location location     = 8 [json_name = "location"];
+    bool is_pinned                 = 9 [json_name = "is_pinned"];
+    int64 created_at               = 10 [json_name = "created_at"];
+}
+
+// --- Group lifecycle & membership ---
+
+message CreateGroupRequest {
+    string name        = 1 [json_name = "name"];
+    string description = 2 [json_name = "description"];
+    string avatar      = 3 [json_name = "avatar"];
+}
+
+message CreateGroupResponse {
+    Group group = 1 [json_name = "group"];
+}
+
+message UpdateGroupRequest {
+    string group_id    = 1 [json_name = "group_id"];
+    string name        = 2 [json_name = "name"];
+    string description = 3 [json_name = "description"];
+    string avatar      = 4 [json_name = "avatar"];
+}
+
+message UpdateGroupResponse {
+    Group group = 1 [json_name = "group"];
+}
+
+message GetGroupRequest {
+    string group_id = 1 [json_name = "group_id"];
+}
+
+message GetGroupResponse {
+    Group group                   = 1 [json_name = "group"];
+    repeated GroupMember members  = 2 [json_name = "members"];
+}
+
+message ListGroupsRequest {}
+
+message ListGroupsResponse {
+    repeated Group groups = 1 [json_name = "groups"];
+}
+
+message DeleteGroupRequest {
+    string group_id = 1 [json_name = "group_id"];
+}
+
+message DeleteGroupResponse {}
+
+message AddMemberRequest {
+    string group_id = 1 [json_name = "group_id"];
+    string user_id  = 2 [json_name = "user_id"];
+}
+
+message AddMemberResponse {
+    GroupMember member = 1 [json_name = "member"];
+}
+
+message RemoveMemberRequest {
+    string group_id = 1 [json_name = "group_id"];
+    string user_id  = 2 [json_name = "user_id"];
+}
+
+message RemoveMemberResponse {}
+
+message LeaveGroupRequest {
+    string group_id = 1 [json_name = "group_id"];
+}
+
+message LeaveGroupResponse {}
+
+// --- Admin management ---
+
+message SetAdminRequest {
+    string group_id             = 1 [json_name = "group_id"];
+    string user_id              = 2 [json_name = "user_id"];
+    GroupPermissions permissions = 3 [json_name = "permissions"];
+}
+
+message SetAdminResponse {
+    GroupMember member = 1 [json_name = "member"];
+}
+
+message UpdateAdminPermissionsRequest {
+    string group_id             = 1 [json_name = "group_id"];
+    string user_id              = 2 [json_name = "user_id"];
+    GroupPermissions permissions = 3 [json_name = "permissions"];
+}
+
+message UpdateAdminPermissionsResponse {
+    GroupMember member = 1 [json_name = "member"];
+}
+
+message RemoveAdminRequest {
+    string group_id = 1 [json_name = "group_id"];
+    string user_id  = 2 [json_name = "user_id"];
+}
+
+message RemoveAdminResponse {
+    GroupMember member = 1 [json_name = "member"];
+}
+
+// --- Group messaging ---
+
+message SendGroupMessageRequest {
+    string group_id                = 1 [json_name = "group_id"];
+    string content                 = 2 [json_name = "content"];
+    repeated string images         = 3 [json_name = "images"];
+    repeated string videos         = 4 [json_name = "videos"];
+    repeated string voice_messages = 5 [json_name = "voice_messages"];
+    optional Location location     = 6 [json_name = "location"];
+}
+
+message SendGroupMessageResponse {
+    GroupMessage message = 1 [json_name = "message"];
+}
+
+message GetGroupMessagesRequest {
+    string group_id = 1 [json_name = "group_id"];
+    int64 cursor    = 2 [json_name = "cursor"];      // Unix timestamp, 0 = latest
+    int32 page_size = 3 [json_name = "page_size"];   // default 30
+}
+
+message GetGroupMessagesResponse {
+    repeated GroupMessage messages = 1 [json_name = "messages"];
+    int64 next_cursor              = 2 [json_name = "next_cursor"];  // 0 = no more
+    bool has_more                  = 3 [json_name = "has_more"];
+}
+
+message DeleteGroupMessageRequest {
+    string group_id = 1 [json_name = "group_id"];
+    string id       = 2 [json_name = "id"];
+}
+
+message DeleteGroupMessageResponse {}
+
+message PinGroupMessageRequest {
+    string group_id = 1 [json_name = "group_id"];
+    string id       = 2 [json_name = "id"];
+    bool pinned     = 3 [json_name = "pinned"];
+}
+
+message PinGroupMessageResponse {}
+
+// --- Real-time events ---
+
+message GroupMessageDeletedEvent {
+    string message_id = 1 [json_name = "message_id"];
+    string sender_id  = 2 [json_name = "sender_id"];
+}
+
+message GroupMessagePinnedEvent {
+    string message_id = 1 [json_name = "message_id"];
+    bool pinned       = 2 [json_name = "pinned"];
+}
+
+// GroupMemberEvent — a'zolik o'zgarishi (added | removed | admin_set | admin_removed)
+message GroupMemberEvent {
+    string user_id = 1 [json_name = "user_id"];
+    string action  = 2 [json_name = "action"];
+}
+
+message StreamGroupEventsRequest {
+    string group_id = 1 [json_name = "group_id"];
+}
+
+// GroupEvent — StreamGroupEvents orqali keladigan barcha event tiplari
+message GroupEvent {
+    oneof event {
+        GroupMessage             message      = 1;
+        GroupMessageDeletedEvent deleted      = 2;
+        GroupMessagePinnedEvent  pinned       = 3;
+        GroupMemberEvent         member_event = 4;
+    }
+}

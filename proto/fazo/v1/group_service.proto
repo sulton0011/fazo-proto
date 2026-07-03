@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/group_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+service GroupService {
+    // --- Group lifecycle & membership ---
+
+    rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups"
+            body: "*"
+        };
+    }
+
+    rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
+        option (google.api.http) = {
+            patch: "/v1/groups/{group_id}"
+            body: "*"
+        };
+    }
+
+    rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {
+        option (google.api.http) = {
+            get: "/v1/groups/{group_id}"
+        };
+    }
+
+    rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
+        option (google.api.http) = {
+            get: "/v1/groups"
+        };
+    }
+
+    rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
+        option (google.api.http) = {
+            delete: "/v1/groups/{group_id}"
+        };
+    }
+
+    rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups/{group_id}/members"
+            body: "*"
+        };
+    }
+
+    rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
+        option (google.api.http) = {
+            delete: "/v1/groups/{group_id}/members/{user_id}"
+        };
+    }
+
+    rpc LeaveGroup(LeaveGroupRequest) returns (LeaveGroupResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups/{group_id}/leave"
+            body: "*"
+        };
+    }
+
+    // --- Admin management ---
+
+    rpc SetAdmin(SetAdminRequest) returns (SetAdminResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups/{group_id}/admins"
+            body: "*"
+        };
+    }
+
+    rpc UpdateAdminPermissions(UpdateAdminPermissionsRequest) returns (UpdateAdminPermissionsResponse) {
+        option (google.api.http) = {
+            patch: "/v1/groups/{group_id}/admins/{user_id}"
+            body: "*"
+        };
+    }
+
+    rpc RemoveAdmin(RemoveAdminRequest) returns (RemoveAdminResponse) {
+        option (google.api.http) = {
+            delete: "/v1/groups/{group_id}/admins/{user_id}"
+        };
+    }
+
+    // --- Group messaging ---
+
+    rpc SendGroupMessage(SendGroupMessageRequest) returns (SendGroupMessageResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups/{group_id}/messages"
+            body: "*"
+        };
+    }
+
+    rpc GetGroupMessages(GetGroupMessagesRequest) returns (GetGroupMessagesResponse) {
+        option (google.api.http) = {
+            get: "/v1/groups/{group_id}/messages"
+        };
+    }
+
+    rpc DeleteGroupMessage(DeleteGroupMessageRequest) returns (DeleteGroupMessageResponse) {
+        option (google.api.http) = {
+            delete: "/v1/groups/{group_id}/messages/{id}"
+        };
+    }
+
+    rpc PinGroupMessage(PinGroupMessageRequest) returns (PinGroupMessageResponse) {
+        option (google.api.http) = {
+            post: "/v1/groups/{group_id}/messages/{id}/pin"
+            body: "*"
+        };
+    }
+
+    // StreamGroupEvents — real-time group events via server-streaming (ConnectRPC only, no gateway)
+    rpc StreamGroupEvents(StreamGroupEventsRequest) returns (stream GroupEvent);
+}
