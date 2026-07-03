@@ -78,4 +78,10 @@ service UserService {
             body: "*"
         };
     }
+
+    rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
+        option (google.api.http) = {
+            delete: "/v1/users/me"
+        };
+    }
 }

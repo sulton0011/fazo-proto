@@ -31,6 +31,12 @@ message UpdatePasswordRequest {
 
 message UpdatePasswordResponse {}
 
+message DeleteAccountRequest {
+    string password = 1 [json_name = "password"];  // joriy parol, tasdiq uchun
+}
+
+message DeleteAccountResponse {}
+
 message AddProfilePictureRequest {
     string url = 1 [json_name = "url"];
 }
