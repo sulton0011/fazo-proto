@@ -10,17 +10,27 @@ message Location {
     string address   = 3 [json_name = "address"];
 }
 
+// ReplyPreview — javob berilgan xabarning yengil ko'rinishi (klient alohida so'rov yubormasligi uchun).
+message ReplyPreview {
+    string id         = 1 [json_name = "id"];
+    string sender_id  = 2 [json_name = "sender_id"];
+    string content    = 3 [json_name = "content"];      // qisqartirilgan preview
+    bool   is_deleted = 4 [json_name = "is_deleted"];   // asl xabar o'chirilgan bo'lsa true
+}
+
 message Message {
-    string id                      = 1 [json_name = "id"];
-    string sender_id               = 2 [json_name = "sender_id"];
-    string recipient_id            = 3 [json_name = "recipient_id"];
-    string content                 = 4 [json_name = "content"];
-    repeated string images         = 5 [json_name = "images"];
-    repeated string videos         = 6 [json_name = "videos"];
-    repeated string voice_messages = 7 [json_name = "voice_messages"];
-    int64 created_at               = 8 [json_name = "created_at"];
-    optional Location location     = 9 [json_name = "location"];
-    bool is_read                   = 10 [json_name = "is_read"];
+    string id                          = 1 [json_name = "id"];
+    string sender_id                   = 2 [json_name = "sender_id"];
+    string recipient_id                = 3 [json_name = "recipient_id"];
+    string content                     = 4 [json_name = "content"];
+    repeated string images             = 5 [json_name = "images"];
+    repeated string videos             = 6 [json_name = "videos"];
+    repeated string voice_messages     = 7 [json_name = "voice_messages"];
+    int64 created_at                   = 8 [json_name = "created_at"];
+    optional Location location         = 9 [json_name = "location"];
+    bool is_read                       = 10 [json_name = "is_read"];
+    optional string reply_to_message_id = 11 [json_name = "reply_to_message_id"];
+    optional ReplyPreview reply_preview = 12 [json_name = "reply_preview"];
 }
 
 message ChatSummary {
@@ -42,6 +52,7 @@ message SendMessageRequest {
     repeated string videos         = 4 [json_name = "videos"];
     repeated string voice_messages = 5 [json_name = "voice_messages"];
     optional Location location     = 6 [json_name = "location"];
+    optional string reply_to_message_id = 7 [json_name = "reply_to_message_id"];
 }
 
 message SendMessageResponse {
