@@ -42,4 +42,39 @@ service AuthService {
             body: "*"
         };
     }
+
+    rpc SendRegistrationOtp(SendRegistrationOtpRequest) returns (SendRegistrationOtpResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/phone/otp"
+            body: "*"
+        };
+    }
+
+    rpc SendPasswordResetOtp(SendPasswordResetOtpRequest) returns (SendPasswordResetOtpResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/password/otp"
+            body: "*"
+        };
+    }
+
+    rpc VerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/otp/verify"
+            body: "*"
+        };
+    }
+
+    rpc RegisterWithPhone(RegisterWithPhoneRequest) returns (RegisterResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/register/phone"
+            body: "*"
+        };
+    }
+
+    rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/password/reset"
+            body: "*"
+        };
+    }
 }
