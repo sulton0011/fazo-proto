@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/contact_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+service ContactService {
+    rpc AddContact(AddContactRequest) returns (AddContactResponse) {
+        option (google.api.http) = {
+            post: "/v1/contacts"
+            body: "*"
+        };
+    }
+
+    rpc ImportContacts(ImportContactsRequest) returns (ImportContactsResponse) {
+        option (google.api.http) = {
+            post: "/v1/contacts/import"
+            body: "*"
+        };
+    }
+
+    rpc GetContacts(GetContactsRequest) returns (GetContactsResponse) {
+        option (google.api.http) = {
+            get: "/v1/contacts"
+        };
+    }
+
+    rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse) {
+        option (google.api.http) = {
+            patch: "/v1/contacts/{phone}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteContacts(DeleteContactsRequest) returns (DeleteContactsResponse) {
+        option (google.api.http) = {
+            post: "/v1/contacts/delete"
+            body: "*"
+        };
+    }
+}
