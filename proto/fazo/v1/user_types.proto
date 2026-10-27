@@ -40,9 +40,9 @@ message UpdatePasswordRequest {
 message UpdatePasswordResponse {}
 
 message DeleteAccountRequest {
-    string password = 1 [json_name = "password"];  // joriy parol, tasdiq uchun
-    // Parolsiz (faqat telefon) akkauntlar uchun: SendLoginOtp + VerifyOtp dan
-    // olingan, akkauntning o'z tasdiqlangan raqamiga tegishli token.
+    string password = 1 [json_name = "password"];  // current password, for confirmation
+    // For passwordless (phone-only) accounts: a token from SendLoginOtp + VerifyOtp
+    // that belongs to the account's own verified phone number.
     string verification_token = 2 [json_name = "verification_token"];
 }
 
