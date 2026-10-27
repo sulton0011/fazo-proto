@@ -41,6 +41,9 @@ message UpdatePasswordResponse {}
 
 message DeleteAccountRequest {
     string password = 1 [json_name = "password"];  // joriy parol, tasdiq uchun
+    // Parolsiz (faqat telefon) akkauntlar uchun: SendLoginOtp + VerifyOtp dan
+    // olingan, akkauntning o'z tasdiqlangan raqamiga tegishli token.
+    string verification_token = 2 [json_name = "verification_token"];
 }
 
 message DeleteAccountResponse {}
