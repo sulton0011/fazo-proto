@@ -130,8 +130,9 @@ message SendLoginOtpRequest {
 }
 
 message SendLoginOtpResponse {
-    int64 expires_in   = 1 [json_name = "expires_in"];    // seconds until the code expires
-    int64 resend_after = 2 [json_name = "resend_after"];  // seconds until a new code may be requested
+    string otp_id      = 1 [json_name = "otp_id"];
+    int32 expires_in   = 2 [json_name = "expires_in"];    // seconds until the code expires
+    int32 resend_after = 3 [json_name = "resend_after"];  // seconds until a new code may be requested
 }
 
 message LoginWithPhoneRequest {
