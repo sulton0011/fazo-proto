@@ -99,6 +99,7 @@ message SendPasswordResetOtpResponse {
 message VerifyOtpRequest {
     string otp_id = 1 [json_name = "otp_id"];
     string code   = 2 [json_name = "code"];
+    // The purpose is taken from the OTP itself: "register" | "password_reset" | "login".
 }
 
 message VerifyOtpResponse {
@@ -108,8 +109,8 @@ message VerifyOtpResponse {
 
 message RegisterWithPhoneRequest {
     string verification_token = 1 [json_name = "verification_token"];
-    string username           = 2 [json_name = "username"];
-    string password           = 3 [json_name = "password"];
+    string username           = 2 [json_name = "username"];   // optional
+    string password           = 3 [json_name = "password"];   // optional
     string full_name          = 4 [json_name = "full_name"];
     string fcm_token          = 5 [json_name = "fcm_token"];  // optional
     string platform           = 6 [json_name = "platform"];   // optional: ios|android|web
@@ -121,3 +122,20 @@ message ResetPasswordRequest {
 }
 
 message ResetPasswordResponse {}
+
+// --- Phone login ---
+
+message SendLoginOtpRequest {
+    string phone = 1 [json_name = "phone"];  // +998XXXXXXXXX; spaces and dashes are stripped
+}
+
+message SendLoginOtpResponse {
+    int64 expires_in   = 1 [json_name = "expires_in"];    // seconds until the code expires
+    int64 resend_after = 2 [json_name = "resend_after"];  // seconds until a new code may be requested
+}
+
+message LoginWithPhoneRequest {
+    string verification_token = 1 [json_name = "verification_token"];  // from VerifyOtp with purpose "login"
+    string fcm_token          = 2 [json_name = "fcm_token"];           // optional
+    string platform           = 3 [json_name = "platform"];            // optional: ios|android|web
+}

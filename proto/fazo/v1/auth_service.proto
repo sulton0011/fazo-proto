@@ -77,4 +77,20 @@ service AuthService {
             body: "*"
         };
     }
+
+    // Sends a login OTP to a verified phone (purpose "login").
+    rpc SendLoginOtp(SendLoginOtpRequest) returns (SendLoginOtpResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login/otp"
+            body: "*"
+        };
+    }
+
+    // Logs in with a verification_token obtained via VerifyOtp (purpose "login").
+    rpc LoginWithPhone(LoginWithPhoneRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login/phone"
+            body: "*"
+        };
+    }
 }
