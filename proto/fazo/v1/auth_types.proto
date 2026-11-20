@@ -8,7 +8,7 @@ message RegisterRequest {
     string full_name = 1 [json_name = "full_name"];
     string username  = 2 [json_name = "username"];
     string password  = 3 [json_name = "password"];
-    string phone     = 4 [json_name = "phone"];  // optional, E.164
+    string phone     = 4 [json_name = "phone"];  // deprecated: ignored, use RegisterWithPhone
 }
 
 message RegisterResponse {
@@ -70,4 +70,73 @@ message User {
     string background_pic            = 7 [json_name = "background_pic"];
     int64 created_at                 = 8 [json_name = "created_at"];
     repeated ProfilePic profile_pics = 9 [json_name = "profile_pics"];
+    bool phone_verified              = 10 [json_name = "phone_verified"];
+}
+
+// --- Phone OTP ---
+
+message SendRegistrationOtpRequest {
+    string phone = 1 [json_name = "phone"];  // +998XXXXXXXXX; spaces and dashes are stripped
+}
+
+message SendRegistrationOtpResponse {
+    string otp_id      = 1 [json_name = "otp_id"];
+    int32 expires_in   = 2 [json_name = "expires_in"];    // seconds until the code expires
+    int32 resend_after = 3 [json_name = "resend_after"];  // seconds until a new code may be requested
+}
+
+message SendPasswordResetOtpRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message SendPasswordResetOtpResponse {
+    string otp_id       = 1 [json_name = "otp_id"];
+    string masked_phone = 2 [json_name = "masked_phone"];  // e.g. +99890***4567
+    int32 expires_in    = 3 [json_name = "expires_in"];
+    int32 resend_after  = 4 [json_name = "resend_after"];
+}
+
+message VerifyOtpRequest {
+    string otp_id = 1 [json_name = "otp_id"];
+    string code   = 2 [json_name = "code"];
+    // The purpose is taken from the OTP itself: "register" | "password_reset" | "login".
+}
+
+message VerifyOtpResponse {
+    string verification_token = 1 [json_name = "verification_token"];  // single use, bound to the OTP purpose
+    int32 expires_in          = 2 [json_name = "expires_in"];
+}
+
+message RegisterWithPhoneRequest {
+    string verification_token = 1 [json_name = "verification_token"];
+    string username           = 2 [json_name = "username"];   // optional
+    string password           = 3 [json_name = "password"];   // optional
+    string full_name          = 4 [json_name = "full_name"];
+    string fcm_token          = 5 [json_name = "fcm_token"];  // optional
+    string platform           = 6 [json_name = "platform"];   // optional: ios|android|web
+}
+
+message ResetPasswordRequest {
+    string verification_token = 1 [json_name = "verification_token"];
+    string new_password       = 2 [json_name = "new_password"];
+}
+
+message ResetPasswordResponse {}
+
+// --- Phone login ---
+
+message SendLoginOtpRequest {
+    string phone = 1 [json_name = "phone"];  // +998XXXXXXXXX; spaces and dashes are stripped
+}
+
+message SendLoginOtpResponse {
+    string otp_id      = 1 [json_name = "otp_id"];
+    int32 expires_in   = 2 [json_name = "expires_in"];    // seconds until the code expires
+    int32 resend_after = 3 [json_name = "resend_after"];  // seconds until a new code may be requested
+}
+
+message LoginWithPhoneRequest {
+    string verification_token = 1 [json_name = "verification_token"];  // from VerifyOtp with purpose "login"
+    string fcm_token          = 2 [json_name = "fcm_token"];           // optional
+    string platform           = 3 [json_name = "platform"];            // optional: ios|android|web
 }

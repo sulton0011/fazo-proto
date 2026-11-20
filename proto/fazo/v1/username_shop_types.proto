@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+enum UsernameCategory {
+    USERNAME_CATEGORY_UNSPECIFIED = 0;
+    USERNAME_CATEGORY_L3          = 1;
+    USERNAME_CATEGORY_L4          = 2;
+    USERNAME_CATEGORY_WORD        = 3;
+    USERNAME_CATEGORY_NUM         = 4;
+}
+
+enum UsernameAvailability {
+    USERNAME_AVAILABILITY_UNSPECIFIED = 0;
+    USERNAME_AVAILABILITY_FREE = 1;
+    USERNAME_AVAILABILITY_PAID = 2;
+    USERNAME_AVAILABILITY_TAKEN = 3;
+    USERNAME_AVAILABILITY_INVALID = 4;
+    USERNAME_AVAILABILITY_RESERVED = 5;
+}
+
+enum UsernameSort {
+    USERNAME_SORT_POPULAR    = 0;
+    USERNAME_SORT_PRICE_ASC  = 1;
+    USERNAME_SORT_PRICE_DESC = 2;
+    USERNAME_SORT_NEW        = 3;
+}
+
+enum PaymentMethod {
+    PAYMENT_METHOD_UNSPECIFIED = 0;
+    PAYMENT_METHOD_APP         = 1;
+    PAYMENT_METHOD_CARD        = 2;
+    PAYMENT_METHOD_QR          = 3;
+}
+
+enum OrderStatus {
+    ORDER_STATUS_UNSPECIFIED = 0;
+    ORDER_STATUS_PENDING     = 1;
+    ORDER_STATUS_PAID        = 2;
+    ORDER_STATUS_FAILED      = 3;
+    ORDER_STATUS_EXPIRED     = 4;
+    ORDER_STATUS_CANCELLED   = 5;
+}
+
+message UsernameForSale {
+    string username           = 1 [json_name = "username"];
+    int64 price               = 2 [json_name = "price"];
+    UsernameCategory category = 3 [json_name = "category"];
+    bool premium              = 4 [json_name = "premium"];
+    bool reserved             = 5 [json_name = "reserved"];
+    int64 created_at          = 6 [json_name = "created_at"];
+}
+
+message UsernameOrder {
+    string id             = 1 [json_name = "id"];
+    string username       = 2 [json_name = "username"];
+    int64 amount          = 3 [json_name = "amount"];
+    PaymentMethod method  = 4 [json_name = "method"];
+    OrderStatus status    = 5 [json_name = "status"];
+    string pay_url        = 6 [json_name = "pay_url"];
+    int64 expires_at      = 7 [json_name = "expires_at"];
+    int64 paid_at         = 8 [json_name = "paid_at"];
+    int64 created_at      = 9 [json_name = "created_at"];
+    string error          = 10 [json_name = "error"];
+}
+
+message ListUsernamesForSaleRequest {
+    UsernameCategory category = 1 [json_name = "category"];
+    bool premium_only         = 2 [json_name = "premium_only"];
+    UsernameSort sort         = 3 [json_name = "sort"];
+    string query              = 4 [json_name = "query"];
+    int32 limit               = 5 [json_name = "limit"];
+    string cursor             = 6 [json_name = "cursor"];
+}
+
+message ListUsernamesForSaleResponse {
+    repeated UsernameForSale items = 1 [json_name = "items"];
+    string next_cursor             = 2 [json_name = "next_cursor"];
+    map<string, int64> counts      = 3 [json_name = "counts"];  // keys: all, l3, l4, word, num, premium
+}
+
+message GetUsernameForSaleRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message GetUsernameForSaleResponse {
+    UsernameForSale item             = 1 [json_name = "item"];
+    repeated UsernameForSale similar = 2 [json_name = "similar"];
+}
+
+message CheckUsernameRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message CheckUsernameResponse {
+    string username                   = 1 [json_name = "username"];
+    UsernameAvailability availability = 2 [json_name = "availability"];
+    int64 price                       = 3 [json_name = "price"];
+    string buy_url                    = 4 [json_name = "buy_url"];
+}
+
+message CreateUsernameOrderRequest {
+    string username      = 1 [json_name = "username"];
+    PaymentMethod method = 2 [json_name = "method"];
+}
+
+message CreateUsernameOrderResponse {
+    UsernameOrder order = 1 [json_name = "order"];
+}
+
+message GetUsernameOrderRequest {
+    string id = 1 [json_name = "id"];
+}
+
+message GetUsernameOrderResponse {
+    UsernameOrder order = 1 [json_name = "order"];
+}
+
+message RequestClickInvoiceRequest {
+    string order_id = 1 [json_name = "order_id"];
+    string phone    = 2 [json_name = "phone"];
+}
+
+message RequestClickInvoiceResponse {
+    UsernameOrder order = 1 [json_name = "order"];
+}
+
+message StartCardPaymentRequest {
+    string order_id    = 1 [json_name = "order_id"];
+    string card_number = 2 [json_name = "card_number"];
+    string expire_date = 3 [json_name = "expire_date"];  // "MMYY"
+}
+
+message StartCardPaymentResponse {
+    string phone_masked = 1 [json_name = "phone_masked"];
+}
+
+message ConfirmCardPaymentRequest {
+    string order_id = 1 [json_name = "order_id"];
+    string sms_code = 2 [json_name = "sms_code"];
+}
+
+message ConfirmCardPaymentResponse {
+    UsernameOrder order = 1 [json_name = "order"];
+}

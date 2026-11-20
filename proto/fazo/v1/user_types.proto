@@ -17,7 +17,15 @@ message UpdateUserResponse {
 }
 
 message UpdateUsernameRequest {
+    string username = 1 [json_name = "username"];  // empty string removes the username
+}
+
+// Attached as an error detail to a FailedPrecondition when the requested
+// username is for sale and cannot be claimed for free.
+message PaidUsernameDetail {
     string username = 1 [json_name = "username"];
+    int64 price     = 2 [json_name = "price"];     // in so'm
+    string buy_url  = 3 [json_name = "buy_url"];
 }
 
 message UpdateUsernameResponse {
@@ -32,7 +40,10 @@ message UpdatePasswordRequest {
 message UpdatePasswordResponse {}
 
 message DeleteAccountRequest {
-    string password = 1 [json_name = "password"];  // joriy parol, tasdiq uchun
+    string password = 1 [json_name = "password"];  // current password, for confirmation
+    // For passwordless (phone-only) accounts: a token from SendLoginOtp + VerifyOtp
+    // that belongs to the account's own verified phone number.
+    string verification_token = 2 [json_name = "verification_token"];
 }
 
 message DeleteAccountResponse {}

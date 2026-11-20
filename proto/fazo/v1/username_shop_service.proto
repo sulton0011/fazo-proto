@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/username_shop_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+service UsernameShopService {
+    rpc ListUsernamesForSale(ListUsernamesForSaleRequest) returns (ListUsernamesForSaleResponse) {
+        option (google.api.http) = {
+            get: "/v1/usernames/for-sale"
+        };
+    }
+
+    rpc GetUsernameForSale(GetUsernameForSaleRequest) returns (GetUsernameForSaleResponse) {
+        option (google.api.http) = {
+            get: "/v1/usernames/for-sale/{username}"
+        };
+    }
+
+    rpc CheckUsername(CheckUsernameRequest) returns (CheckUsernameResponse) {
+        option (google.api.http) = {
+            get: "/v1/usernames/check/{username}"
+        };
+    }
+
+    rpc CreateUsernameOrder(CreateUsernameOrderRequest) returns (CreateUsernameOrderResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/orders"
+            body: "*"
+        };
+    }
+
+    rpc GetUsernameOrder(GetUsernameOrderRequest) returns (GetUsernameOrderResponse) {
+        option (google.api.http) = {
+            get: "/v1/usernames/orders/{id}"
+        };
+    }
+
+    rpc RequestClickInvoice(RequestClickInvoiceRequest) returns (RequestClickInvoiceResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/orders/{order_id}/invoice"
+            body: "*"
+        };
+    }
+
+    rpc StartCardPayment(StartCardPaymentRequest) returns (StartCardPaymentResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/orders/{order_id}/card"
+            body: "*"
+        };
+    }
+
+    rpc ConfirmCardPayment(ConfirmCardPaymentRequest) returns (ConfirmCardPaymentResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/orders/{order_id}/card/confirm"
+            body: "*"
+        };
+    }
+}

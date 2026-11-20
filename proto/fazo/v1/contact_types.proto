@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/auth_types.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Contact is a registered user saved in the caller's contact list under a
+// name the caller chose (like a phone book entry).
+message Contact {
+    User user          = 1 [json_name = "user"];        // profile_pics is always empty here
+    string phone       = 2 [json_name = "phone"];       // +998XXXXXXXXX
+    string first_name  = 3 [json_name = "first_name"];  // name given by the caller
+    string last_name   = 4 [json_name = "last_name"];
+    bool is_mutual     = 5 [json_name = "is_mutual"];   // the user has the caller in their contacts too
+    int64 created_at   = 6 [json_name = "created_at"];  // Unix seconds
+}
+
+message ContactInput {
+    string phone      = 1 [json_name = "phone"];       // +998XXXXXXXXX, 998XXXXXXXXX or XXXXXXXXX; spaces, dashes, brackets are stripped
+    string first_name = 2 [json_name = "first_name"];
+    string last_name  = 3 [json_name = "last_name"];
+}
+
+message AddContactRequest {
+    string phone      = 1 [json_name = "phone"];
+    string first_name = 2 [json_name = "first_name"];  // required, max 64 chars
+    string last_name  = 3 [json_name = "last_name"];   // optional, max 64 chars
+}
+
+message AddContactResponse {
+    Contact contact = 1 [json_name = "contact"];
+}
+
+message ImportContactsRequest {
+    repeated ContactInput contacts = 1 [json_name = "contacts"];  // max 500 per request
+}
+
+message ImportContactsResponse {
+    repeated Contact contacts     = 1 [json_name = "contacts"];        // imported entries that belong to registered users
+    int32 imported                = 2 [json_name = "imported"];        // entries saved (registered or not)
+    repeated string invalid_phones = 3 [json_name = "invalid_phones"]; // raw values that could not be parsed, skipped
+}
+
+message GetContactsRequest {}
+
+message GetContactsResponse {
+    repeated Contact contacts = 1 [json_name = "contacts"];  // only registered users, sorted by first_name, last_name
+}
+
+message UpdateContactRequest {
+    string phone      = 1 [json_name = "phone"];
+    string first_name = 2 [json_name = "first_name"];  // required, max 64 chars
+    string last_name  = 3 [json_name = "last_name"];
+}
+
+message UpdateContactResponse {
+    Contact contact = 1 [json_name = "contact"];
+}
+
+message DeleteContactsRequest {
+    repeated string phones = 1 [json_name = "phones"];  // max 500 per request
+}
+
+message DeleteContactsResponse {
+    int32 deleted = 1 [json_name = "deleted"];
+}
