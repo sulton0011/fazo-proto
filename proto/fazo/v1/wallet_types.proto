@@ -8,8 +8,8 @@ option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 // Zenit is an internal point balance: bought on the website through Click or,
 // in the iOS app, through the App Store. It is spent on gifts and usernames and
-// earned by reselling an owned username. It cannot be cashed out or sent to
-// another user.
+// earned by reselling an owned username. It cannot be cashed out; it can be
+// sent to another user (SendZenit).
 
 enum ZenitStore {
     ZENIT_STORE_UNSPECIFIED = 0;
@@ -29,6 +29,10 @@ enum WalletTxKind {
     WALLET_TX_KIND_REFUND       = 6;
     WALLET_TX_KIND_ADMIN_ADJUST = 7;
     WALLET_TX_KIND_SELL_USERNAME = 8;
+    // Zenit sent to another user (amount < 0).
+    WALLET_TX_KIND_SEND_ZENIT    = 9;
+    // Zenit received from another user (amount > 0).
+    WALLET_TX_KIND_RECEIVE_ZENIT = 10;
 }
 
 message Wallet {
@@ -47,9 +51,15 @@ message WalletTransaction {
     // buy_gift: owned gift id (OwnedGift.id); buy_username / sell_username:
     // the username; top-ups: internal purchase or order id.
     string ref_id       = 5 [json_name = "ref_id"];
-    // buy_gift: catalog gift id; top-ups: pack id.
+    // buy_gift: catalog gift id; top-ups: pack id; send_zenit /
+    // receive_zenit: the sender's message.
     string note         = 6 [json_name = "note"];
     int64 created_at    = 7 [json_name = "created_at"];
+    // send_zenit: the recipient; receive_zenit: the sender. Empty for other
+    // kinds.
+    string counterparty_id       = 8 [json_name = "counterparty_id"];
+    // The counterparty's current username; empty when they have none.
+    string counterparty_username = 9 [json_name = "counterparty_username"];
 }
 
 message ZenitPack {
@@ -349,6 +359,17 @@ enum WalletErrorReason {
     WALLET_ERROR_REASON_SOLD_OUT               = 11;
     // The gift / username / listing is not available any more.
     WALLET_ERROR_REASON_NOT_AVAILABLE          = 12;
+    // SendZenit / GiftUsername: the recipient does not exist or was deleted
+    // (NotFound).
+    WALLET_ERROR_REASON_RECIPIENT_NOT_FOUND    = 13;
+    // SendZenit / GiftUsername to yourself (InvalidArgument).
+    WALLET_ERROR_REASON_SELF_TRANSFER          = 14;
+    // SendZenit would exceed the sender's 24-hour sending limit
+    // (ResourceExhausted).
+    WALLET_ERROR_REASON_DAILY_LIMIT            = 15;
+    // GiftUsername of the caller's current (primary) username: switch the
+    // primary first (FailedPrecondition).
+    WALLET_ERROR_REASON_PRIMARY_USERNAME       = 16;
 }
 
 message WalletErrorDetail {
@@ -357,4 +378,36 @@ message WalletErrorDetail {
     int64 pin_locked_until   = 2 [json_name = "pin_locked_until"];
     // WRONG_PIN: tries left before the block.
     int32 pin_attempts_left  = 3 [json_name = "pin_attempts_left"];
+}
+
+message SendZenitRequest {
+    string recipient_id    = 1 [json_name = "recipient_id"];
+    // Zenit, 1-100000 per transfer.
+    int64 amount           = 2 [json_name = "amount"];
+    // Optional, at most 200 characters.
+    string message         = 3 [json_name = "message"];
+    string wallet_token    = 4 [json_name = "wallet_token"];
+    // Client-generated, unique per transfer attempt; a retry with the same
+    // key returns the first result instead of sending again.
+    string idempotency_key = 5 [json_name = "idempotency_key"];
+}
+
+message SendZenitResponse {
+    // The sender's wallet after the transfer.
+    Wallet wallet                 = 1 [json_name = "wallet"];
+    // The sender's ledger row (WALLET_TX_KIND_SEND_ZENIT).
+    WalletTransaction transaction = 2 [json_name = "transaction"];
+}
+
+message GiftUsernameRequest {
+    string username     = 1 [json_name = "username"];
+    string recipient_id = 2 [json_name = "recipient_id"];
+    // Optional, at most 200 characters.
+    string message      = 3 [json_name = "message"];
+    string wallet_token = 4 [json_name = "wallet_token"];
+}
+
+message GiftUsernameResponse {
+    string username     = 1 [json_name = "username"];
+    string recipient_id = 2 [json_name = "recipient_id"];
 }
