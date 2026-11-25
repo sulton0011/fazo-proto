@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Instagram-like follow graph. A public profile is followed at once; a
+// private profile (users.profile_hidden) gets a follow request its owner
+// accepts or declines.
+
+enum FollowState {
+    FOLLOW_STATE_NONE    = 0;
+    // An accepted follow.
+    FOLLOW_STATE_ACTIVE  = 1;
+    // A request waiting for a private profile's owner.
+    FOLLOW_STATE_PENDING = 2;
+}
+
+// One account in a followers / following / requests list.
+message FollowUser {
+    string user_id     = 1 [json_name = "user_id"];
+    string username    = 2 [json_name = "username"];
+    string full_name   = 3 [json_name = "full_name"];
+    string avatar_url  = 4 [json_name = "avatar_url"];
+    // The caller's own follow state toward this account.
+    FollowState my_state = 5 [json_name = "my_state"];
+    int64 since        = 6 [json_name = "since"];
+}
+
+message FollowStats {
+    string user_id        = 1 [json_name = "user_id"];
+    int64 followers       = 2 [json_name = "followers"];
+    int64 following       = 3 [json_name = "following"];
+    // The caller → this user.
+    FollowState my_state  = 4 [json_name = "my_state"];
+    // This user → the caller (ACTIVE means "follows you").
+    FollowState their_state = 5 [json_name = "their_state"];
+    bool is_private       = 6 [json_name = "is_private"];
+}
+
+message FollowUserRequest {
+    string user_id = 1 [json_name = "user_id"];
+}
+
+message FollowUserResponse {
+    // ACTIVE for a public profile, PENDING for a private one.
+    FollowState state = 1 [json_name = "state"];
+    FollowStats stats = 2 [json_name = "stats"];
+}
+
+message UnfollowUserRequest {
+    // Removes an active follow or withdraws a pending request.
+    string user_id = 1 [json_name = "user_id"];
+}
+
+message UnfollowUserResponse {
+    FollowStats stats = 1 [json_name = "stats"];
+}
+
+message RemoveFollowerRequest {
+    // The caller removes this account from their own followers.
+    string user_id = 1 [json_name = "user_id"];
+}
+
+message RemoveFollowerResponse {}
+
+message ListFollowRequestsRequest {
+    string cursor = 1 [json_name = "cursor"];
+    int32 limit   = 2 [json_name = "limit"];
+}
+
+message ListFollowRequestsResponse {
+    repeated FollowUser items = 1 [json_name = "items"];
+    string next_cursor        = 2 [json_name = "next_cursor"];
+}
+
+message RespondFollowRequestRequest {
+    string follower_id = 1 [json_name = "follower_id"];
+    bool accept        = 2 [json_name = "accept"];
+}
+
+message RespondFollowRequestResponse {}
+
+message ListFollowersRequest {
+    string user_id = 1 [json_name = "user_id"];
+    string cursor  = 2 [json_name = "cursor"];
+    int32 limit    = 3 [json_name = "limit"];
+}
+
+message ListFollowersResponse {
+    repeated FollowUser items = 1 [json_name = "items"];
+    string next_cursor        = 2 [json_name = "next_cursor"];
+}
+
+message ListFollowingRequest {
+    string user_id = 1 [json_name = "user_id"];
+    string cursor  = 2 [json_name = "cursor"];
+    int32 limit    = 3 [json_name = "limit"];
+}
+
+message ListFollowingResponse {
+    repeated FollowUser items = 1 [json_name = "items"];
+    string next_cursor        = 2 [json_name = "next_cursor"];
+}
+
+message GetFollowStatsRequest {
+    string user_id = 1 [json_name = "user_id"];
+}
+
+message GetFollowStatsResponse {
+    FollowStats stats = 1 [json_name = "stats"];
+}
+
+message GetFollowStatesRequest {
+    // Up to 100 ids, e.g. the creators on one feed page.
+    repeated string user_ids = 1 [json_name = "user_ids"];
+}
+
+message GetFollowStatesResponse {
+    // user_id → the caller's follow state toward that user.
+    map<string, FollowState> states = 1 [json_name = "states"];
+}

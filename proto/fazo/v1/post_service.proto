@@ -73,4 +73,17 @@ service PostService {
             get: "/v1/posts/access-requests/my"
         };
     }
+
+    rpc RecordPostView(RecordPostViewRequest) returns (RecordPostViewResponse) {
+        option (google.api.http) = {
+            post: "/v1/posts/{post_id}/views"
+            body: "*"
+        };
+    }
+
+    rpc GetFeed(GetFeedRequest) returns (GetFeedResponse) {
+        option (google.api.http) = {
+            get: "/v1/feed"
+        };
+    }
 }

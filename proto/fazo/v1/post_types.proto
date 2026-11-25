@@ -29,6 +29,10 @@ message Post {
     bool is_public                   = 12 [json_name = "is_public"];
     int64 price                      = 13 [json_name = "price"];       // so'm birligida
     AccessStatus access_status       = 14 [json_name = "access_status"]; // privat postlar uchun: NONE/PENDING/ACCEPTED/REJECTED; public postlarda UNSPECIFIED
+    // Unique viewers. Filled when views_visible is true: on video posts for
+    // everyone, on other posts only for the author (otherwise 0).
+    int64 view_count                 = 15 [json_name = "view_count"];
+    bool views_visible               = 16 [json_name = "views_visible"];
 }
 
 message CreatePostRequest {
@@ -96,4 +100,42 @@ message LikePostRequest {
 
 message LikePostResponse {
     Post post = 1 [json_name = "post"];
+}
+
+// RecordPostView counts one unique view per user per post. The client sends
+// it once a video has played >= 2 s or a picture post stayed on screen >= 1 s;
+// later calls only raise the stored watch time (a ranking signal).
+message RecordPostViewRequest {
+    string post_id = 1 [json_name = "post_id"];
+    // Milliseconds watched in this session (0 for pictures).
+    int64 watch_ms = 2 [json_name = "watch_ms"];
+    // Video length in ms when known; lets the server compute completion.
+    int64 duration_ms = 3 [json_name = "duration_ms"];
+}
+
+message RecordPostViewResponse {
+    // True when this call created the user's first view of the post.
+    bool counted     = 1 [json_name = "counted"];
+    int64 view_count = 2 [json_name = "view_count"];
+}
+
+enum FeedKind {
+    // Recommended ("Siz uchun").
+    FEED_KIND_FOR_YOU   = 0;
+    // Only accounts the caller actively follows, newest first ("Obunalar").
+    FEED_KIND_FOLLOWING = 1;
+}
+
+message GetFeedRequest {
+    FeedKind kind   = 1 [json_name = "kind"];
+    // Opaque; empty for the first page.
+    string cursor   = 2 [json_name = "cursor"];
+    int32 page_size = 3 [json_name = "page_size"];  // default 20, max 50
+    // 0 = all types; the media page passes POST_TYPE_MEDIA_CHAT.
+    PostType type   = 4 [json_name = "type"];
+}
+
+message GetFeedResponse {
+    repeated Post posts = 1 [json_name = "posts"];
+    string next_cursor  = 2 [json_name = "next_cursor"];
 }

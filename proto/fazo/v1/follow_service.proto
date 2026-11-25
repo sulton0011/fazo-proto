@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/follow_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Follow graph. Every RPC needs a JWT.
+service FollowService {
+    rpc FollowUser(FollowUserRequest) returns (FollowUserResponse) {
+        option (google.api.http) = { post: "/v1/follows/{user_id}" body: "*" };
+    }
+    rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse) {
+        option (google.api.http) = { delete: "/v1/follows/{user_id}" };
+    }
+    rpc RemoveFollower(RemoveFollowerRequest) returns (RemoveFollowerResponse) {
+        option (google.api.http) = { delete: "/v1/followers/{user_id}" };
+    }
+    rpc ListFollowRequests(ListFollowRequestsRequest) returns (ListFollowRequestsResponse) {
+        option (google.api.http) = { get: "/v1/follow-requests" };
+    }
+    rpc RespondFollowRequest(RespondFollowRequestRequest) returns (RespondFollowRequestResponse) {
+        option (google.api.http) = { post: "/v1/follow-requests/{follower_id}" body: "*" };
+    }
+    rpc ListFollowers(ListFollowersRequest) returns (ListFollowersResponse) {
+        option (google.api.http) = { get: "/v1/users/{user_id}/followers" };
+    }
+    rpc ListFollowing(ListFollowingRequest) returns (ListFollowingResponse) {
+        option (google.api.http) = { get: "/v1/users/{user_id}/following" };
+    }
+    rpc GetFollowStats(GetFollowStatsRequest) returns (GetFollowStatsResponse) {
+        option (google.api.http) = { get: "/v1/users/{user_id}/follow-stats" };
+    }
+    rpc GetFollowStates(GetFollowStatesRequest) returns (GetFollowStatesResponse) {
+        option (google.api.http) = { post: "/v1/follows/states" body: "*" };
+    }
+}
