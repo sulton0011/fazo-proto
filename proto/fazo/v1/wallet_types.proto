@@ -33,6 +33,8 @@ enum WalletTxKind {
     WALLET_TX_KIND_SEND_ZENIT    = 9;
     // Zenit received from another user (amount > 0).
     WALLET_TX_KIND_RECEIVE_ZENIT = 10;
+    // Fazo Premium bought (amount < 0; ref_id = plan id).
+    WALLET_TX_KIND_BUY_PREMIUM   = 11;
 }
 
 message Wallet {
@@ -410,4 +412,45 @@ message GiftUsernameRequest {
 message GiftUsernameResponse {
     string username     = 1 [json_name = "username"];
     string recipient_id = 2 [json_name = "recipient_id"];
+}
+
+// --- Fazo Premium ---
+
+message PremiumPlan {
+    string id    = 1 [json_name = "id"];
+    int32 months = 2 [json_name = "months"];
+    int32 days   = 3 [json_name = "days"];
+    // Zenit.
+    int64 price  = 4 [json_name = "price"];
+}
+
+message PremiumStatus {
+    bool active      = 1 [json_name = "active"];
+    // Unix seconds when premium ends (or ended); 0 if never bought.
+    int64 expires_at = 2 [json_name = "expires_at"];
+}
+
+message ListPremiumPlansRequest {}
+
+message ListPremiumPlansResponse {
+    repeated PremiumPlan plans = 1 [json_name = "plans"];
+}
+
+message GetPremiumStatusRequest {}
+
+message GetPremiumStatusResponse {
+    PremiumStatus status = 1 [json_name = "status"];
+}
+
+message BuyPremiumRequest {
+    string plan_id         = 1 [json_name = "plan_id"];
+    string wallet_token    = 2 [json_name = "wallet_token"];
+    // Client-generated, unique per purchase attempt; a retry with the same
+    // key returns the first result instead of charging again.
+    string idempotency_key = 3 [json_name = "idempotency_key"];
+}
+
+message BuyPremiumResponse {
+    PremiumStatus status = 1 [json_name = "status"];
+    Wallet wallet        = 2 [json_name = "wallet"];
 }

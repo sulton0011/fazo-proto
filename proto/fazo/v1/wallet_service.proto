@@ -10,7 +10,7 @@ option go_package = "fazo-service/gen/fazo/v1;fazov1";
 // Zenit wallet. ListGifts is public; every other RPC needs a JWT. Wallet RPCs
 // (balance, PIN, top-ups, purchases, listings) also need a phone-verified
 // account. Spending RPCs (BuyGift, BuyUsername, BuyListedUsername, SendZenit,
-// GiftUsername) need a wallet_token from UnlockWallet. CreateZenitOrder / GetZenitOrder are for the
+// GiftUsername, BuyPremium) need a wallet_token from UnlockWallet. CreateZenitOrder / GetZenitOrder are for the
 // website only; the app never links to them.
 service WalletService {
     rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
@@ -149,6 +149,28 @@ service WalletService {
     rpc GiftUsername(GiftUsernameRequest) returns (GiftUsernameResponse) {
         option (google.api.http) = {
             post: "/v1/wallet/usernames/gift"
+            body: "*"
+        };
+    }
+
+    // Fazo Premium plans (price in Zenit).
+    rpc ListPremiumPlans(ListPremiumPlansRequest) returns (ListPremiumPlansResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/premium/plans"
+        };
+    }
+
+    // The caller's premium status.
+    rpc GetPremiumStatus(GetPremiumStatusRequest) returns (GetPremiumStatusResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/premium"
+        };
+    }
+
+    // Buys (or extends) Fazo Premium with Zenit. Needs a wallet_token.
+    rpc BuyPremium(BuyPremiumRequest) returns (BuyPremiumResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/premium/buy"
             body: "*"
         };
     }

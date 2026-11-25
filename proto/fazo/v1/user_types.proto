@@ -139,3 +139,60 @@ message SetLastSeenPrivacyRequest {
 message SetLastSeenPrivacyResponse {
     User user = 1 [json_name = "user"];
 }
+
+// --- Premium profile ---
+
+// Replaces the whole premium profile with these values (send the full state).
+// The video avatar is the exception: an empty video_avatar_file_id keeps the
+// current one unless clear_video_avatar is set.
+message UpdatePremiumProfileRequest {
+    // gift_catalog id of a gift the caller owns, or "".
+    string badge_gift_id           = 1 [json_name = "badge_gift_id"];
+    // Preset id ([a-z0-9_-], 1-32 chars) or "".
+    string theme                   = 2 [json_name = "theme"];
+    // "#RRGGBB" or "".
+    string gradient_from           = 3 [json_name = "gradient_from"];
+    string gradient_to             = 4 [json_name = "gradient_to"];
+    bool animated_ring             = 5 [json_name = "animated_ring"];
+    // file_store id of the caller's own uploaded, ready video.
+    string video_avatar_file_id    = 6 [json_name = "video_avatar_file_id"];
+    bool clear_video_avatar        = 7 [json_name = "clear_video_avatar"];
+    // Up to 2 emoji or a short text (<= 16 characters), or "".
+    string emoji_status            = 8 [json_name = "emoji_status"];
+    // gift_catalog id of a gift the caller owns, or "".
+    string emoji_status_gift_id    = 9 [json_name = "emoji_status_gift_id"];
+    // At most 3 user_gifts ids the caller owns.
+    repeated string showcase_gift_ids = 10 [json_name = "showcase_gift_ids"];
+}
+
+message UpdatePremiumProfileResponse {
+    User user = 1 [json_name = "user"];
+}
+
+// --- Profile viewers ---
+
+message RecordProfileViewRequest {
+    string user_id = 1 [json_name = "user_id"];
+}
+
+message RecordProfileViewResponse {}
+
+message ListProfileViewersRequest {
+    string cursor = 1 [json_name = "cursor"];
+    // Default 20, max 100.
+    int32 limit   = 2 [json_name = "limit"];
+}
+
+message ProfileViewer {
+    User user       = 1 [json_name = "user"];
+    // Unix seconds of the viewer's latest view.
+    int64 viewed_at = 2 [json_name = "viewed_at"];
+}
+
+message ListProfileViewersResponse {
+    // Distinct viewers in the last 30 days (for everyone).
+    int64 total                    = 1 [json_name = "total"];
+    // Premium callers only; empty otherwise.
+    repeated ProfileViewer viewers = 2 [json_name = "viewers"];
+    string next_cursor             = 3 [json_name = "next_cursor"];
+}

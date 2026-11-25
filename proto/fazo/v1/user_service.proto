@@ -101,4 +101,28 @@ service UserService {
             body: "*"
         };
     }
+
+    // UpdatePremiumProfile — premium profile decoration (needs active premium).
+    rpc UpdatePremiumProfile(UpdatePremiumProfileRequest) returns (UpdatePremiumProfileResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/me/premium-profile"
+            body: "*"
+        };
+    }
+
+    // RecordProfileView — the caller opened user_id's profile (once per day counts).
+    rpc RecordProfileView(RecordProfileViewRequest) returns (RecordProfileViewResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/profile-views"
+            body: "*"
+        };
+    }
+
+    // ListProfileViewers — who viewed the caller's profile in the last 30 days.
+    // Everyone gets the total; only premium callers get the list.
+    rpc ListProfileViewers(ListProfileViewersRequest) returns (ListProfileViewersResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/me/profile-viewers"
+        };
+    }
 }
