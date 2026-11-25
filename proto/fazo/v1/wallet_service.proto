@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/wallet_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Zenit wallet. ListGifts is public; every other RPC needs a JWT. Wallet RPCs
+// (balance, PIN, top-ups, purchases, listings) also need a phone-verified
+// account. Spending RPCs (BuyGift, BuyUsername, BuyListedUsername) need a
+// wallet_token from UnlockWallet. CreateZenitOrder / GetZenitOrder are for the
+// website only; the app never links to them.
+service WalletService {
+    rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet"
+        };
+    }
+
+    rpc ListWalletTransactions(ListWalletTransactionsRequest) returns (ListWalletTransactionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/transactions"
+        };
+    }
+
+    rpc SetWalletPin(SetWalletPinRequest) returns (SetWalletPinResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/pin"
+            body: "*"
+        };
+    }
+
+    rpc UnlockWallet(UnlockWalletRequest) returns (UnlockWalletResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/unlock"
+            body: "*"
+        };
+    }
+
+    rpc ListZenitPacks(ListZenitPacksRequest) returns (ListZenitPacksResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/packs"
+        };
+    }
+
+    rpc VerifyStorePurchase(VerifyStorePurchaseRequest) returns (VerifyStorePurchaseResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/store-purchases"
+            body: "*"
+        };
+    }
+
+    rpc ListGifts(ListGiftsRequest) returns (ListGiftsResponse) {
+        option (google.api.http) = {
+            get: "/v1/gifts"
+        };
+    }
+
+    rpc BuyGift(BuyGiftRequest) returns (BuyGiftResponse) {
+        option (google.api.http) = {
+            post: "/v1/gifts/buy"
+            body: "*"
+        };
+    }
+
+    rpc GetUsernameZenitPrice(GetUsernameZenitPriceRequest) returns (GetUsernameZenitPriceResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/usernames/{username}/price"
+        };
+    }
+
+    rpc BuyUsername(BuyUsernameRequest) returns (BuyUsernameResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/usernames/buy"
+            body: "*"
+        };
+    }
+
+    rpc ListUserCollectibles(ListUserCollectiblesRequest) returns (ListUserCollectiblesResponse) {
+        option (google.api.http) = {
+            get: "/v1/collectibles"
+        };
+    }
+
+    rpc SetGiftHidden(SetGiftHiddenRequest) returns (SetGiftHiddenResponse) {
+        option (google.api.http) = {
+            post: "/v1/collectibles/gifts/{id}/hidden"
+            body: "*"
+        };
+    }
+
+    rpc SetPrimaryUsername(SetPrimaryUsernameRequest) returns (SetPrimaryUsernameResponse) {
+        option (google.api.http) = {
+            post: "/v1/collectibles/usernames/primary"
+            body: "*"
+        };
+    }
+
+    rpc ListUsernameForSale(ListUsernameForSaleRequest) returns (ListUsernameForSaleResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/listings"
+            body: "*"
+        };
+    }
+
+    rpc CancelUsernameListing(CancelUsernameListingRequest) returns (CancelUsernameListingResponse) {
+        option (google.api.http) = {
+            delete: "/v1/usernames/listings/{username}"
+        };
+    }
+
+    rpc ListUsernameListings(ListUsernameListingsRequest) returns (ListUsernameListingsResponse) {
+        option (google.api.http) = {
+            get: "/v1/usernames/listings"
+        };
+    }
+
+    rpc BuyListedUsername(BuyListedUsernameRequest) returns (BuyListedUsernameResponse) {
+        option (google.api.http) = {
+            post: "/v1/usernames/listings/{username}/buy"
+            body: "*"
+        };
+    }
+
+    rpc CreateZenitOrder(CreateZenitOrderRequest) returns (CreateZenitOrderResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallet/zenit-orders"
+            body: "*"
+        };
+    }
+
+    rpc GetZenitOrder(GetZenitOrderRequest) returns (GetZenitOrderResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallet/zenit-orders/{id}"
+        };
+    }
+}
