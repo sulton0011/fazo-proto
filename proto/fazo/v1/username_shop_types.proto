@@ -51,6 +51,8 @@ message UsernameForSale {
     bool premium              = 4 [json_name = "premium"];
     bool reserved             = 5 [json_name = "reserved"];
     int64 created_at          = 6 [json_name = "created_at"];
+    // Price in Zenit for an in-app purchase (price is so'm, website only).
+    int64 zenit_price         = 7 [json_name = "zenit_price"];
 }
 
 message UsernameOrder {

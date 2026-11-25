@@ -1,0 +1,360 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/username_shop_types.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Zenit is an internal point balance: bought on the website through Click or,
+// in the iOS app, through the App Store. It is spent on gifts and usernames and
+// earned by reselling an owned username. It cannot be cashed out or sent to
+// another user.
+
+enum ZenitStore {
+    ZENIT_STORE_UNSPECIFIED = 0;
+    ZENIT_STORE_APPLE       = 1;
+    ZENIT_STORE_GOOGLE      = 2;
+    // Website checkout through Click (ZenitPack.price_uzs).
+    ZENIT_STORE_WEB         = 3;
+}
+
+enum WalletTxKind {
+    WALLET_TX_KIND_UNSPECIFIED  = 0;
+    WALLET_TX_KIND_TOPUP_APPLE  = 1;
+    WALLET_TX_KIND_TOPUP_GOOGLE = 2;
+    WALLET_TX_KIND_TOPUP_CLICK  = 3;
+    WALLET_TX_KIND_BUY_GIFT     = 4;
+    WALLET_TX_KIND_BUY_USERNAME = 5;
+    WALLET_TX_KIND_REFUND       = 6;
+    WALLET_TX_KIND_ADMIN_ADJUST = 7;
+    WALLET_TX_KIND_SELL_USERNAME = 8;
+}
+
+message Wallet {
+    int64 balance          = 1 [json_name = "balance"];
+    bool has_pin           = 2 [json_name = "has_pin"];
+    // Unix seconds until which PIN entry is blocked; 0 when not blocked.
+    int64 pin_locked_until = 3 [json_name = "pin_locked_until"];
+}
+
+message WalletTransaction {
+    string id           = 1 [json_name = "id"];
+    // Signed: positive credit, negative debit.
+    int64 amount        = 2 [json_name = "amount"];
+    int64 balance_after = 3 [json_name = "balance_after"];
+    WalletTxKind kind   = 4 [json_name = "kind"];
+    // buy_gift: owned gift id (OwnedGift.id); buy_username / sell_username:
+    // the username; top-ups: internal purchase or order id.
+    string ref_id       = 5 [json_name = "ref_id"];
+    // buy_gift: catalog gift id; top-ups: pack id.
+    string note         = 6 [json_name = "note"];
+    int64 created_at    = 7 [json_name = "created_at"];
+}
+
+message ZenitPack {
+    string id                = 1 [json_name = "id"];
+    int64 zenit              = 2 [json_name = "zenit"];
+    // Store product id for the requested store (App Store or Play); empty
+    // for ZENIT_STORE_WEB.
+    string product_id        = 3 [json_name = "product_id"];
+    // Website price in so'm (ZENIT_STORE_WEB only).
+    int64 price_uzs          = 4 [json_name = "price_uzs"];
+}
+
+message GiftItem {
+    string id         = 1 [json_name = "id"];
+    string name       = 2 [json_name = "name"];
+    int64 price       = 3 [json_name = "price"];
+    bool popular      = 4 [json_name = "popular"];
+    string image_url  = 5 [json_name = "image_url"];
+    // 0 = unlimited.
+    int64 supply_left    = 6 [json_name = "supply_left"];
+    string collection    = 7 [json_name = "collection"];
+    // Lottie JSON.
+    string animation_url = 8 [json_name = "animation_url"];
+}
+
+message OwnedGift {
+    string id              = 1 [json_name = "id"];
+    string gift_id         = 2 [json_name = "gift_id"];
+    string name            = 3 [json_name = "name"];
+    string image_url       = 4 [json_name = "image_url"];
+    int64 price            = 5 [json_name = "price"];
+    string sender_id       = 6 [json_name = "sender_id"];
+    string sender_username = 7 [json_name = "sender_username"];
+    string message         = 8 [json_name = "message"];
+    bool hidden            = 9 [json_name = "hidden"];
+    int64 created_at       = 10 [json_name = "created_at"];
+    string collection      = 11 [json_name = "collection"];
+    string animation_url   = 12 [json_name = "animation_url"];
+}
+
+message OwnedUsername {
+    string username = 1 [json_name = "username"];
+    bool premium    = 2 [json_name = "premium"];
+    int64 bought_at = 3 [json_name = "bought_at"];
+    // The owner's current username (users.username).
+    bool primary    = 4 [json_name = "primary"];
+    // Resale price in Zenit when listed; 0 = not listed.
+    int64 listed_price = 5 [json_name = "listed_price"];
+}
+
+// A username its owner sells for Zenit.
+message UsernameListing {
+    string username        = 1 [json_name = "username"];
+    int64 price            = 2 [json_name = "price"];
+    bool premium           = 3 [json_name = "premium"];
+    string seller_id       = 4 [json_name = "seller_id"];
+    string seller_username = 5 [json_name = "seller_username"];
+    int64 created_at       = 6 [json_name = "created_at"];
+}
+
+// Zenit bought on the website through Click.
+message ZenitOrder {
+    string id          = 1 [json_name = "id"];
+    string pack_id     = 2 [json_name = "pack_id"];
+    int64 zenit        = 3 [json_name = "zenit"];
+    // So'm.
+    int64 amount       = 4 [json_name = "amount"];
+    OrderStatus status = 5 [json_name = "status"];
+    // Click checkout link while the order is pending.
+    string pay_url     = 6 [json_name = "pay_url"];
+    int64 expires_at   = 7 [json_name = "expires_at"];
+    int64 created_at   = 8 [json_name = "created_at"];
+    int64 paid_at      = 9 [json_name = "paid_at"];
+    string error       = 10 [json_name = "error"];
+}
+
+message GetWalletRequest {}
+
+message GetWalletResponse {
+    Wallet wallet = 1 [json_name = "wallet"];
+}
+
+message ListWalletTransactionsRequest {
+    string cursor = 1 [json_name = "cursor"];
+    int32 limit   = 2 [json_name = "limit"];
+}
+
+message ListWalletTransactionsResponse {
+    repeated WalletTransaction items = 1 [json_name = "items"];
+    string next_cursor               = 2 [json_name = "next_cursor"];
+}
+
+message SetWalletPinRequest {
+    // 4-6 digits.
+    string new_pin     = 1 [json_name = "new_pin"];
+    // Required when a PIN is already set.
+    string current_pin = 2 [json_name = "current_pin"];
+}
+
+message SetWalletPinResponse {
+    Wallet wallet = 1 [json_name = "wallet"];
+}
+
+message UnlockWalletRequest {
+    string pin = 1 [json_name = "pin"];
+}
+
+message UnlockWalletResponse {
+    // Short-lived token required by the spending RPCs.
+    string wallet_token = 1 [json_name = "wallet_token"];
+    int64 expires_at    = 2 [json_name = "expires_at"];
+    Wallet wallet       = 3 [json_name = "wallet"];
+}
+
+message ListZenitPacksRequest {
+    ZenitStore store = 1 [json_name = "store"];
+}
+
+message ListZenitPacksResponse {
+    repeated ZenitPack packs = 1 [json_name = "packs"];
+}
+
+message VerifyStorePurchaseRequest {
+    ZenitStore store      = 1 [json_name = "store"];
+    string product_id     = 2 [json_name = "product_id"];
+    // Apple: transactionId. Google: purchaseToken.
+    string purchase_token = 3 [json_name = "purchase_token"];
+}
+
+message VerifyStorePurchaseResponse {
+    // Zenit added by this call; 0 when the purchase was already credited.
+    int64 credited = 1 [json_name = "credited"];
+    Wallet wallet  = 2 [json_name = "wallet"];
+}
+
+message ListGiftsRequest {}
+
+message ListGiftsResponse {
+    repeated GiftItem gifts = 1 [json_name = "gifts"];
+}
+
+message BuyGiftRequest {
+    string gift_id         = 1 [json_name = "gift_id"];
+    // Empty = buy for yourself.
+    string recipient_id    = 2 [json_name = "recipient_id"];
+    string message         = 3 [json_name = "message"];
+    string wallet_token    = 4 [json_name = "wallet_token"];
+    // Client-generated, unique per purchase attempt; a retry with the same
+    // key returns the first result instead of charging again.
+    string idempotency_key = 5 [json_name = "idempotency_key"];
+}
+
+message BuyGiftResponse {
+    OwnedGift gift = 1 [json_name = "gift"];
+    Wallet wallet  = 2 [json_name = "wallet"];
+}
+
+message GetUsernameZenitPriceRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message GetUsernameZenitPriceResponse {
+    string username = 1 [json_name = "username"];
+    int64 price     = 2 [json_name = "price"];
+    bool available  = 3 [json_name = "available"];
+}
+
+message BuyUsernameRequest {
+    string username        = 1 [json_name = "username"];
+    string wallet_token    = 2 [json_name = "wallet_token"];
+    string idempotency_key = 3 [json_name = "idempotency_key"];
+}
+
+message BuyUsernameResponse {
+    string username = 1 [json_name = "username"];
+    int64 price     = 2 [json_name = "price"];
+    Wallet wallet   = 3 [json_name = "wallet"];
+}
+
+message ListUserCollectiblesRequest {
+    // Empty = the caller.
+    string user_id = 1 [json_name = "user_id"];
+    string cursor  = 2 [json_name = "cursor"];
+    int32 limit    = 3 [json_name = "limit"];
+}
+
+message ListUserCollectiblesResponse {
+    repeated OwnedGift gifts            = 1 [json_name = "gifts"];
+    // Only on the first page.
+    repeated OwnedUsername usernames    = 2 [json_name = "usernames"];
+    string next_cursor                  = 3 [json_name = "next_cursor"];
+    // All gifts visible to the caller (hidden ones only for the owner);
+    // set on the first page.
+    int64 gift_count                    = 4 [json_name = "gift_count"];
+}
+
+message SetGiftHiddenRequest {
+    string id   = 1 [json_name = "id"];
+    bool hidden = 2 [json_name = "hidden"];
+}
+
+message SetGiftHiddenResponse {}
+
+message SetPrimaryUsernameRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message SetPrimaryUsernameResponse {
+    string username = 1 [json_name = "username"];
+}
+
+message ListUsernameForSaleRequest {
+    string username = 1 [json_name = "username"];
+    // Zenit.
+    int64 price         = 2 [json_name = "price"];
+    // Listing gives a name away for Zenit, so it needs the PIN like a purchase.
+    string wallet_token = 3 [json_name = "wallet_token"];
+}
+
+message ListUsernameForSaleResponse {
+    UsernameListing listing = 1 [json_name = "listing"];
+}
+
+message CancelUsernameListingRequest {
+    string username = 1 [json_name = "username"];
+}
+
+message CancelUsernameListingResponse {}
+
+message ListUsernameListingsRequest {
+    string query  = 1 [json_name = "query"];
+    string cursor = 2 [json_name = "cursor"];
+    int32 limit   = 3 [json_name = "limit"];
+}
+
+message ListUsernameListingsResponse {
+    repeated UsernameListing items = 1 [json_name = "items"];
+    string next_cursor             = 2 [json_name = "next_cursor"];
+}
+
+message BuyListedUsernameRequest {
+    string username        = 1 [json_name = "username"];
+    // The price the buyer saw; the purchase fails if the seller changed it.
+    int64 expected_price   = 2 [json_name = "expected_price"];
+    string wallet_token    = 3 [json_name = "wallet_token"];
+    string idempotency_key = 4 [json_name = "idempotency_key"];
+}
+
+message BuyListedUsernameResponse {
+    string username = 1 [json_name = "username"];
+    int64 price     = 2 [json_name = "price"];
+    Wallet wallet   = 3 [json_name = "wallet"];
+}
+
+message CreateZenitOrderRequest {
+    string pack_id = 1 [json_name = "pack_id"];
+}
+
+message CreateZenitOrderResponse {
+    ZenitOrder order = 1 [json_name = "order"];
+}
+
+message GetZenitOrderRequest {
+    string id = 1 [json_name = "id"];
+}
+
+message GetZenitOrderResponse {
+    ZenitOrder order = 1 [json_name = "order"];
+}
+
+// Machine-readable reason attached (as a Connect error detail) to wallet
+// errors, so clients never parse error messages.
+enum WalletErrorReason {
+    WALLET_ERROR_REASON_UNSPECIFIED            = 0;
+    // The account is not phone-verified (PermissionDenied).
+    WALLET_ERROR_REASON_PHONE_REQUIRED         = 1;
+    // wallet_token missing, expired or for another user: ask the PIN
+    // (FailedPrecondition; deliberately not Unauthenticated, which means the
+    // login itself expired).
+    WALLET_ERROR_REASON_WALLET_LOCKED          = 2;
+    // No PIN set yet (FailedPrecondition).
+    WALLET_ERROR_REASON_NO_PIN                 = 3;
+    // Wrong PIN (PermissionDenied); see pin_attempts_left.
+    WALLET_ERROR_REASON_WRONG_PIN              = 4;
+    // Too many wrong PINs (ResourceExhausted); see pin_locked_until.
+    WALLET_ERROR_REASON_PIN_BLOCKED            = 5;
+    WALLET_ERROR_REASON_NOT_ENOUGH_ZENIT       = 6;
+    // A listing's price differs from expected_price.
+    WALLET_ERROR_REASON_PRICE_CHANGED          = 7;
+    // The caller does not own the username.
+    WALLET_ERROR_REASON_NOT_OWNER              = 8;
+    // The store says the purchase must not be credited (unknown, revoked,
+    // other app/product). The client should finish the transaction.
+    WALLET_ERROR_REASON_INVALID_PURCHASE       = 9;
+    // The receipt was already credited to another account. Finish it.
+    WALLET_ERROR_REASON_PURCHASE_OTHER_ACCOUNT = 10;
+    WALLET_ERROR_REASON_SOLD_OUT               = 11;
+    // The gift / username / listing is not available any more.
+    WALLET_ERROR_REASON_NOT_AVAILABLE          = 12;
+}
+
+message WalletErrorDetail {
+    WalletErrorReason reason = 1 [json_name = "reason"];
+    // PIN_BLOCKED: unix seconds when PIN entry opens again.
+    int64 pin_locked_until   = 2 [json_name = "pin_locked_until"];
+    // WRONG_PIN: tries left before the block.
+    int32 pin_attempts_left  = 3 [json_name = "pin_attempts_left"];
+}
