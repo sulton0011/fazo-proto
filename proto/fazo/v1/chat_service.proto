@@ -66,6 +66,15 @@ service ChatService {
         };
     }
 
+    // SendChatActivity — "yozmoqda / rasm yubormoqda / fayl yubormoqda" holatini
+    // suhbatdoshga (yoki guruhga) yuboradi. DB ga yozilmaydi, server tomonda throttle.
+    rpc SendChatActivity(SendChatActivityRequest) returns (SendChatActivityResponse) {
+        option (google.api.http) = {
+            post: "/v1/chats/activity"
+            body: "*"
+        };
+    }
+
     // StreamMessages — real-time chat events via server-streaming (ConnectRPC only, no gateway)
     rpc StreamMessages(StreamMessagesRequest) returns (stream ChatEvent);
 

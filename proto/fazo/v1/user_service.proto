@@ -84,4 +84,21 @@ service UserService {
             delete: "/v1/users/me"
         };
     }
+
+    // GetPresence — bir nechta foydalanuvchining onlayn holati / oxirgi faolligi
+    // (maxfiylik qoidalari qo'llangan holda).
+    rpc GetPresence(GetPresenceRequest) returns (GetPresenceResponse) {
+        option (google.api.http) = {
+            post: "/v1/users/presence"
+            body: "*"
+        };
+    }
+
+    // SetLastSeenPrivacy — "Oxirgi faollik: Hamma / Hech kim" sozlamasi.
+    rpc SetLastSeenPrivacy(SetLastSeenPrivacyRequest) returns (SetLastSeenPrivacyResponse) {
+        option (google.api.http) = {
+            put: "/v1/users/me/last-seen-privacy"
+            body: "*"
+        };
+    }
 }

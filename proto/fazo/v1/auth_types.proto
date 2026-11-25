@@ -71,6 +71,16 @@ message User {
     int64 created_at                 = 8 [json_name = "created_at"];
     repeated ProfilePic profile_pics = 9 [json_name = "profile_pics"];
     bool phone_verified              = 10 [json_name = "phone_verified"];
+    // last_seen_privacy — faqat o'zi uchun (GetMe, SetLastSeenPrivacy) to'ldiriladi;
+    // boshqa foydalanuvchi profilida UNSPECIFIED bo'ladi.
+    LastSeenPrivacy last_seen_privacy = 11 [json_name = "last_seen_privacy"];
+}
+
+// LastSeenPrivacy — oxirgi faollik (onlayn / oxirgi marta) kimga ko'rinadi.
+enum LastSeenPrivacy {
+    LAST_SEEN_PRIVACY_UNSPECIFIED = 0;
+    LAST_SEEN_PRIVACY_EVERYONE    = 1;  // hamma (standart)
+    LAST_SEEN_PRIVACY_NOBODY      = 2;  // hech kim (o'zaro: o'zi ham boshqalarnikini aniq ko'rmaydi)
 }
 
 // --- Phone OTP ---
