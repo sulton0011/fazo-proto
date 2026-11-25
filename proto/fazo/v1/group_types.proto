@@ -209,6 +209,9 @@ message GroupMemberEvent {
 
 message StreamGroupEventsRequest {
     string group_id = 1 [json_name = "group_id"];
+    // want_activity — true bo'lsa a'zolarning "yozmoqda…" (activity) eventlari ham keladi.
+    // Eski ilovalar yubormaydi → stream avvalgidek ishlaydi.
+    bool want_activity = 2 [json_name = "want_activity"];
 }
 
 // GroupEvent — StreamGroupEvents orqali keladigan barcha event tiplari
@@ -218,5 +221,6 @@ message GroupEvent {
         GroupMessageDeletedEvent deleted      = 2;
         GroupMessagePinnedEvent  pinned       = 3;
         GroupMemberEvent         member_event = 4;
+        ActivityEvent            activity     = 5 [json_name = "activity"];  // faqat want_activity=true bo'lsa
     }
 }

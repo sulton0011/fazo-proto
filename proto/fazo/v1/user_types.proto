@@ -3,6 +3,7 @@ syntax = "proto3";
 package fazo.v1;
 
 import "fazo/v1/auth_types.proto";
+import "fazo/v1/chat_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
@@ -118,4 +119,23 @@ message GetAllUsersResponse {
     repeated User users = 1 [json_name = "users"];
     string next_cursor  = 2 [json_name = "next_cursor"];
     bool has_more       = 3 [json_name = "has_more"];
+}
+
+// --- Presence ---
+
+message GetPresenceRequest {
+    repeated string user_ids = 1 [json_name = "user_ids"];  // 1..200 ta
+}
+
+message GetPresenceResponse {
+    // user_id → presence. O'chirilgan / mavjud bo'lmagan foydalanuvchilar kalitda bo'lmaydi.
+    map<string, PresenceEvent> presences = 1 [json_name = "presences"];
+}
+
+message SetLastSeenPrivacyRequest {
+    LastSeenPrivacy privacy = 1 [json_name = "privacy"];  // EVERYONE yoki NOBODY
+}
+
+message SetLastSeenPrivacyResponse {
+    User user = 1 [json_name = "user"];
 }
