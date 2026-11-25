@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package fazo.v1;
 
+import "fazo/v1/file_types.proto";
+
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Location {
@@ -31,6 +33,7 @@ message Message {
     bool is_read                       = 10 [json_name = "is_read"];
     optional string reply_to_message_id = 11 [json_name = "reply_to_message_id"];
     optional ReplyPreview reply_preview = 12 [json_name = "reply_preview"];
+    repeated MediaMeta media_meta       = 13 [json_name = "media_meta"];  // media o'lchamlari; eski xabarlarda bo'sh
 }
 
 message ChatSummary {
@@ -53,6 +56,7 @@ message SendMessageRequest {
     repeated string voice_messages = 5 [json_name = "voice_messages"];
     optional Location location     = 6 [json_name = "location"];
     optional string reply_to_message_id = 7 [json_name = "reply_to_message_id"];
+    repeated MediaMeta media_meta  = 8 [json_name = "media_meta"];  // ixtiyoriy; noto'g'ri yozuvlar tashlanadi
 }
 
 message SendMessageResponse {
@@ -78,6 +82,8 @@ message UpdateMessageRequest {
     repeated string videos         = 4 [json_name = "videos"];
     repeated string voice_messages = 5 [json_name = "voice_messages"];
     optional Location location     = 6 [json_name = "location"];
+    // media_meta — yangi qo'shilgan media uchun; saqlanib qolgan media eski meta'sini saqlaydi.
+    repeated MediaMeta media_meta  = 7 [json_name = "media_meta"];
 }
 
 message UpdateMessageResponse {

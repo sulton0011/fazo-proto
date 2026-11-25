@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package fazo.v1;
 
+import "fazo/v1/file_types.proto";
+
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 message Comment {
@@ -15,6 +17,7 @@ message Comment {
     string reply_to                = 8  [json_name = "reply_to"];    // empty = top-level
     string reactions               = 9  [json_name = "reactions"];   // JSON string: {"👍":["user_id1",...]}
     int64 created_at               = 10 [json_name = "created_at"];
+    repeated MediaMeta media_meta  = 11 [json_name = "media_meta"];  // media o'lchamlari; eski izohlarda bo'sh
 }
 
 message CreateCommentRequest {
@@ -24,6 +27,7 @@ message CreateCommentRequest {
     repeated string videos         = 4 [json_name = "videos"];
     repeated string voice_messages = 5 [json_name = "voice_messages"];
     string reply_to                = 6 [json_name = "reply_to"];  // optional
+    repeated MediaMeta media_meta  = 7 [json_name = "media_meta"];  // ixtiyoriy; noto'g'ri yozuvlar tashlanadi
 }
 
 message CreateCommentResponse {
@@ -47,6 +51,8 @@ message UpdateCommentRequest {
     repeated string images         = 3 [json_name = "images"];
     repeated string videos         = 4 [json_name = "videos"];
     repeated string voice_messages = 5 [json_name = "voice_messages"];
+    // media_meta — yangi qo'shilgan media uchun; saqlanib qolgan media eski meta'sini saqlaydi.
+    repeated MediaMeta media_meta  = 6 [json_name = "media_meta"];
 }
 
 message UpdateCommentResponse {

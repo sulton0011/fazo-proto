@@ -3,6 +3,7 @@ syntax = "proto3";
 package fazo.v1;
 
 import "fazo/v1/chat_types.proto";
+import "fazo/v1/file_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
@@ -48,6 +49,7 @@ message GroupMessage {
     optional Location location     = 8 [json_name = "location"];
     bool is_pinned                 = 9 [json_name = "is_pinned"];
     int64 created_at               = 10 [json_name = "created_at"];
+    repeated MediaMeta media_meta  = 11 [json_name = "media_meta"];  // media o'lchamlari; eski xabarlarda bo'sh
 }
 
 // --- Group lifecycle & membership ---
@@ -156,6 +158,7 @@ message SendGroupMessageRequest {
     repeated string videos         = 4 [json_name = "videos"];
     repeated string voice_messages = 5 [json_name = "voice_messages"];
     optional Location location     = 6 [json_name = "location"];
+    repeated MediaMeta media_meta  = 7 [json_name = "media_meta"];  // ixtiyoriy; noto'g'ri yozuvlar tashlanadi
 }
 
 message SendGroupMessageResponse {
