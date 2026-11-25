@@ -10,6 +10,7 @@ enum UsernameCategory {
     USERNAME_CATEGORY_L4          = 2;
     USERNAME_CATEGORY_WORD        = 3;
     USERNAME_CATEGORY_NUM         = 4;
+    USERNAME_CATEGORY_L2          = 5;  // 2-character names (sold only)
 }
 
 enum UsernameAvailability {
@@ -80,7 +81,7 @@ message ListUsernamesForSaleRequest {
 message ListUsernamesForSaleResponse {
     repeated UsernameForSale items = 1 [json_name = "items"];
     string next_cursor             = 2 [json_name = "next_cursor"];
-    map<string, int64> counts      = 3 [json_name = "counts"];  // keys: all, l3, l4, word, num, premium
+    map<string, int64> counts      = 3 [json_name = "counts"];  // keys: all, l2, l3, l4, word, num, premium
 }
 
 message GetUsernameForSaleRequest {
