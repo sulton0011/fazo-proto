@@ -50,3 +50,228 @@ message GetCommunityRecommendationsResponse {
     // "Siz uchun": never includes communities the caller is in.
     repeated RecommendedCommunity communities = 1 [json_name = "communities"];
 }
+
+// ── Channels / groups: membership, moderation, invites, views ──────────────
+
+message GetCommunityRequest {
+    string post_id = 1 [json_name = "post_id"];
+}
+
+message GetCommunityResponse {
+    // Post.community is filled completely (role, rights, permissions, pins…).
+    Post community = 1 [json_name = "community"];
+}
+
+message JoinCommunityRequest {
+    string post_id = 1 [json_name = "post_id"];
+}
+
+message JoinCommunityResponse {
+    // true: the caller is a member now (or already was).
+    bool joined       = 1 [json_name = "joined"];
+    // Closed community: an access request was sent instead (joined = false).
+    bool pending      = 2 [json_name = "pending"];
+    string request_id = 3 [json_name = "request_id"];
+    Post community    = 4 [json_name = "community"];
+}
+
+message LeaveCommunityRequest {
+    string post_id = 1 [json_name = "post_id"];
+}
+
+message LeaveCommunityResponse {}
+
+message CommunityMember {
+    string user_id              = 1 [json_name = "user_id"];
+    string username             = 2 [json_name = "username"];
+    string full_name            = 3 [json_name = "full_name"];
+    string avatar_url           = 4 [json_name = "avatar_url"];
+    // UNSPECIFIED for rows of the ban list.
+    CommunityRole role          = 5 [json_name = "role"];
+    CommunityAdminRights rights = 6 [json_name = "rights"];
+    int64 joined_at             = 7 [json_name = "joined_at"];
+    // Muted by an admin until (unix s); 0 = not muted.
+    int64 muted_until           = 8 [json_name = "muted_until"];
+    // Ban list rows only.
+    int64 banned_at             = 9 [json_name = "banned_at"];
+    string banned_by            = 10 [json_name = "banned_by"];
+    string ban_reason           = 11 [json_name = "ban_reason"];
+}
+
+message ListCommunityMembersRequest {
+    string post_id     = 1 [json_name = "post_id"];
+    // UNSPECIFIED = all roles.
+    CommunityRole role = 2 [json_name = "role"];
+    // Case-insensitive substring of full name / username, ≤ 100.
+    string query       = 3 [json_name = "query"];
+    string cursor      = 4 [json_name = "cursor"];     // opaque
+    int32 page_size    = 5 [json_name = "page_size"];  // default 20, max 50
+    // List the ban list instead (admins with ban_users only).
+    bool banned        = 6 [json_name = "banned"];
+}
+
+message ListCommunityMembersResponse {
+    // Owner first, then admins, then members; newest joined first.
+    repeated CommunityMember members = 1 [json_name = "members"];
+    string next_cursor               = 2 [json_name = "next_cursor"];
+    bool has_more                    = 3 [json_name = "has_more"];
+}
+
+message MuteCommunityRequest {
+    string post_id = 1 [json_name = "post_id"];
+    // true = no pushes from this community.
+    bool muted     = 2 [json_name = "muted"];
+}
+
+message MuteCommunityResponse {}
+
+message PinCommunityMessageRequest {
+    string post_id    = 1 [json_name = "post_id"];
+    string comment_id = 2 [json_name = "comment_id"];
+}
+
+message PinCommunityMessageResponse {
+    repeated CommunityPinnedMessage pinned = 1 [json_name = "pinned"];
+}
+
+message UnpinCommunityMessageRequest {
+    string post_id    = 1 [json_name = "post_id"];
+    string comment_id = 2 [json_name = "comment_id"];
+}
+
+message UnpinCommunityMessageResponse {
+    repeated CommunityPinnedMessage pinned = 1 [json_name = "pinned"];
+}
+
+message RemoveCommunityMemberRequest {
+    string post_id = 1 [json_name = "post_id"];
+    string user_id = 2 [json_name = "user_id"];
+}
+
+message RemoveCommunityMemberResponse {}
+
+message BanCommunityMemberRequest {
+    string post_id = 1 [json_name = "post_id"];
+    string user_id = 2 [json_name = "user_id"];
+    string reason  = 3 [json_name = "reason"];  // ≤ 200
+}
+
+message BanCommunityMemberResponse {}
+
+message UnbanCommunityMemberRequest {
+    string post_id = 1 [json_name = "post_id"];
+    string user_id = 2 [json_name = "user_id"];
+}
+
+message UnbanCommunityMemberResponse {}
+
+message MuteCommunityMemberRequest {
+    string post_id         = 1 [json_name = "post_id"];
+    string user_id         = 2 [json_name = "user_id"];
+    // 0 = lift the mute; otherwise 60 .. 31536000 (1 year).
+    int64 duration_seconds = 3 [json_name = "duration_seconds"];
+}
+
+message MuteCommunityMemberResponse {
+    int64 muted_until = 1 [json_name = "muted_until"];
+}
+
+message PromoteCommunityAdminRequest {
+    string post_id              = 1 [json_name = "post_id"];
+    string user_id              = 2 [json_name = "user_id"];
+    // Rights of the admin; also used to change an existing admin's rights.
+    CommunityAdminRights rights = 3 [json_name = "rights"];
+}
+
+message PromoteCommunityAdminResponse {
+    CommunityMember member = 1 [json_name = "member"];
+}
+
+message DemoteCommunityAdminRequest {
+    string post_id = 1 [json_name = "post_id"];
+    string user_id = 2 [json_name = "user_id"];
+}
+
+message DemoteCommunityAdminResponse {
+    CommunityMember member = 1 [json_name = "member"];
+}
+
+message UpdateCommunitySettingsRequest {
+    string post_id                   = 1 [json_name = "post_id"];
+    // Each field: unset = unchanged.
+    optional string title            = 2 [json_name = "title"];
+    optional string description      = 3 [json_name = "description"];
+    // 0, 10, 30, 60, 300, 900, 3600
+    optional int32 slow_mode_seconds = 4 [json_name = "slow_mode_seconds"];
+    CommunityPermissions permissions = 5 [json_name = "permissions"];
+    optional bool is_public          = 6 [json_name = "is_public"];
+}
+
+message UpdateCommunitySettingsResponse {
+    Post community = 1 [json_name = "community"];
+}
+
+message CommunityInviteLink {
+    string token       = 1 [json_name = "token"];
+    string post_id     = 2 [json_name = "post_id"];
+    string created_by  = 3 [json_name = "created_by"];
+    // unix s; 0 = never expires
+    int64 expires_at   = 4 [json_name = "expires_at"];
+    // 0 = unlimited
+    int32 usage_limit  = 5 [json_name = "usage_limit"];
+    int32 used_count   = 6 [json_name = "used_count"];
+    bool revoked       = 7 [json_name = "revoked"];
+    int64 created_at   = 8 [json_name = "created_at"];
+}
+
+message CreateCommunityInviteLinkRequest {
+    string post_id           = 1 [json_name = "post_id"];
+    // 0 = never; otherwise 60 .. 31536000
+    int64 expires_in_seconds = 2 [json_name = "expires_in_seconds"];
+    // 0 = unlimited; max 100000
+    int32 usage_limit        = 3 [json_name = "usage_limit"];
+}
+
+message CreateCommunityInviteLinkResponse {
+    CommunityInviteLink link = 1 [json_name = "link"];
+}
+
+message ListCommunityInviteLinksRequest {
+    string post_id = 1 [json_name = "post_id"];
+}
+
+message ListCommunityInviteLinksResponse {
+    // Owner / admins: every link; others: their own. Newest first, max 100.
+    repeated CommunityInviteLink links = 1 [json_name = "links"];
+}
+
+message RevokeInviteLinkRequest {
+    string token = 1 [json_name = "token"];
+}
+
+message RevokeInviteLinkResponse {}
+
+message JoinByInviteRequest {
+    string token = 1 [json_name = "token"];
+}
+
+message JoinByInviteResponse {
+    bool joined    = 1 [json_name = "joined"];
+    Post community = 2 [json_name = "community"];
+}
+
+message MarkCommunityMessagesViewedRequest {
+    string post_id             = 1 [json_name = "post_id"];
+    // 1 .. 100 message (comment) ids of this community.
+    repeated string comment_ids = 2 [json_name = "comment_ids"];
+}
+
+message CommunityMessageViews {
+    string comment_id = 1 [json_name = "comment_id"];
+    int64 views       = 2 [json_name = "views"];
+}
+
+message MarkCommunityMessagesViewedResponse {
+    // Current counts of the existing (not deleted) requested messages.
+    repeated CommunityMessageViews views = 1 [json_name = "views"];
+}

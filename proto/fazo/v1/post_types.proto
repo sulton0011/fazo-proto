@@ -72,6 +72,8 @@ message CreatePostRequest {
     int64 price               = 9 [json_name = "price"];              // shop_chat da majburiy (> 0)
     // global_chat only; UNSPECIFIED = other.
     CommunityCategory community_category = 10 [json_name = "community_category"];
+    // global_chat only; UNSPECIFIED = GROUP. Immutable after creation.
+    CommunityKind community_kind         = 11 [json_name = "community_kind"];
 }
 
 message CreatePostResponse {

@@ -116,4 +116,82 @@ message CommunityInfo {
     // Filled by CommunityService only.
     bool is_member             = 7 [json_name = "is_member"];
     int64 last_activity_at     = 8 [json_name = "last_activity_at"];
+
+    // ── Channels / groups (00050) ──
+    // GROUP (every member writes) or CHANNEL (only owner / admins write).
+    // Chosen at creation, immutable. Filled everywhere (PostService too).
+    CommunityKind kind                    = 9  [json_name = "kind"];
+    // The caller's role; UNSPECIFIED = not a member. CommunityService only.
+    CommunityRole my_role                 = 10 [json_name = "my_role"];
+    // What ordinary members of a group may do. CommunityService only.
+    CommunityPermissions permissions      = 11 [json_name = "permissions"];
+    // Group slow mode: seconds between two messages of one member (owner /
+    // admins exempt); 0 = off. CommunityService only.
+    int32 slow_mode_seconds               = 12 [json_name = "slow_mode_seconds"];
+    // Pinned messages, newest pin first (max 20). GetCommunity only.
+    repeated CommunityPinnedMessage pinned = 13 [json_name = "pinned"];
+    // The caller turned this community's notifications off (MuteCommunity).
+    bool is_muted                         = 14 [json_name = "is_muted"];
+    // The caller's admin rights (all true for the owner, all false for
+    // members). CommunityService only.
+    CommunityAdminRights my_rights        = 15 [json_name = "my_rights"];
+    // The caller may write now (member of a group / admin of a channel, not
+    // banned, not muted). Slow mode is not reflected. CommunityService only.
+    bool can_post                         = 16 [json_name = "can_post"];
+    // The caller may create invite links. CommunityService only.
+    bool can_invite                       = 17 [json_name = "can_invite"];
+    // The caller may pin messages. CommunityService only.
+    bool can_pin                          = 18 [json_name = "can_pin"];
+    // The caller is muted by an admin until this time (unix s); 0 = not.
+    int64 muted_until                     = 19 [json_name = "muted_until"];
+    // The caller is banned from this community (cannot join / write).
+    bool is_banned                        = 20 [json_name = "is_banned"];
+}
+
+enum CommunityKind {
+    // Old clients / rows: treated as GROUP.
+    COMMUNITY_KIND_UNSPECIFIED = 0;
+    COMMUNITY_KIND_GROUP       = 1;
+    COMMUNITY_KIND_CHANNEL     = 2;
+}
+
+enum CommunityRole {
+    // Not a member.
+    COMMUNITY_ROLE_UNSPECIFIED = 0;
+    COMMUNITY_ROLE_OWNER       = 1;
+    COMMUNITY_ROLE_ADMIN       = 2;
+    COMMUNITY_ROLE_MEMBER      = 3;
+}
+
+// Group-wide rights of ordinary members (owner / admins always may).
+message CommunityPermissions {
+    // images / videos / voice messages
+    bool send_media   = 1 [json_name = "send_media"];
+    bool send_links   = 2 [json_name = "send_links"];
+    bool pin_messages = 3 [json_name = "pin_messages"];
+    // create invite links
+    bool invite_users = 4 [json_name = "invite_users"];
+}
+
+// Rights of an admin (the owner has all of them).
+message CommunityAdminRights {
+    // delete other people's messages
+    bool delete_messages = 1 [json_name = "delete_messages"];
+    // remove / ban / mute members
+    bool ban_users       = 2 [json_name = "ban_users"];
+    bool pin_messages    = 3 [json_name = "pin_messages"];
+    // title / description / slow mode / permissions / is_public
+    bool change_info     = 4 [json_name = "change_info"];
+}
+
+// Small summary of a pinned community message.
+message CommunityPinnedMessage {
+    string comment_id = 1 [json_name = "comment_id"];
+    string user_id    = 2 [json_name = "user_id"];
+    // First 200 characters of the text.
+    string text       = 3 [json_name = "text"];
+    bool has_media    = 4 [json_name = "has_media"];
+    int64 created_at  = 5 [json_name = "created_at"];
+    string pinned_by  = 6 [json_name = "pinned_by"];
+    int64 pinned_at   = 7 [json_name = "pinned_at"];
 }

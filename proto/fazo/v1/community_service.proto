@@ -8,9 +8,10 @@ import "google/api/annotations.proto";
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 // CommunityService — the Global page: community lists with category filter,
-// official badge, activity and "Siz uchun" recommendations. Creating,
-// editing and joining communities stays in PostService (CreatePost type
-// GLOBAL_CHAT, RequestPostAccess, ...). Auth: required.
+// official badge, activity and "Siz uchun" recommendations; channels /
+// groups: membership, roles, moderation, pins, invite links and message
+// views. Creating and editing communities stays in PostService (CreatePost
+// type GLOBAL_CHAT with community_kind, UpdatePost). Auth: required.
 service CommunityService {
     rpc ListCommunities(ListCommunitiesRequest) returns (ListCommunitiesResponse) {
         option (google.api.http) = {
@@ -21,6 +22,136 @@ service CommunityService {
     rpc GetCommunityRecommendations(GetCommunityRecommendationsRequest) returns (GetCommunityRecommendationsResponse) {
         option (google.api.http) = {
             get: "/v1/communities/recommendations"
+        };
+    }
+
+    // ── Channels / groups (see docs/api/community.md) ──
+
+    rpc GetCommunity(GetCommunityRequest) returns (GetCommunityResponse) {
+        option (google.api.http) = {
+            get: "/v1/communities/{post_id}/info"
+        };
+    }
+
+    rpc JoinCommunity(JoinCommunityRequest) returns (JoinCommunityResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/join"
+            body: "*"
+        };
+    }
+
+    rpc LeaveCommunity(LeaveCommunityRequest) returns (LeaveCommunityResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/leave"
+            body: "*"
+        };
+    }
+
+    rpc ListCommunityMembers(ListCommunityMembersRequest) returns (ListCommunityMembersResponse) {
+        option (google.api.http) = {
+            get: "/v1/communities/{post_id}/members"
+        };
+    }
+
+    rpc MuteCommunity(MuteCommunityRequest) returns (MuteCommunityResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/mute"
+            body: "*"
+        };
+    }
+
+    rpc PinCommunityMessage(PinCommunityMessageRequest) returns (PinCommunityMessageResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/pins"
+            body: "*"
+        };
+    }
+
+    rpc UnpinCommunityMessage(UnpinCommunityMessageRequest) returns (UnpinCommunityMessageResponse) {
+        option (google.api.http) = {
+            delete: "/v1/communities/{post_id}/pins/{comment_id}"
+        };
+    }
+
+    rpc RemoveCommunityMember(RemoveCommunityMemberRequest) returns (RemoveCommunityMemberResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/remove"
+            body: "*"
+        };
+    }
+
+    rpc BanCommunityMember(BanCommunityMemberRequest) returns (BanCommunityMemberResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/ban"
+            body: "*"
+        };
+    }
+
+    rpc UnbanCommunityMember(UnbanCommunityMemberRequest) returns (UnbanCommunityMemberResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/unban"
+            body: "*"
+        };
+    }
+
+    rpc MuteCommunityMember(MuteCommunityMemberRequest) returns (MuteCommunityMemberResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/mute"
+            body: "*"
+        };
+    }
+
+    rpc PromoteCommunityAdmin(PromoteCommunityAdminRequest) returns (PromoteCommunityAdminResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/promote"
+            body: "*"
+        };
+    }
+
+    rpc DemoteCommunityAdmin(DemoteCommunityAdminRequest) returns (DemoteCommunityAdminResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/members/{user_id}/demote"
+            body: "*"
+        };
+    }
+
+    rpc UpdateCommunitySettings(UpdateCommunitySettingsRequest) returns (UpdateCommunitySettingsResponse) {
+        option (google.api.http) = {
+            patch: "/v1/communities/{post_id}/settings"
+            body: "*"
+        };
+    }
+
+    rpc CreateCommunityInviteLink(CreateCommunityInviteLinkRequest) returns (CreateCommunityInviteLinkResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/invites"
+            body: "*"
+        };
+    }
+
+    rpc ListCommunityInviteLinks(ListCommunityInviteLinksRequest) returns (ListCommunityInviteLinksResponse) {
+        option (google.api.http) = {
+            get: "/v1/communities/{post_id}/invites"
+        };
+    }
+
+    rpc RevokeInviteLink(RevokeInviteLinkRequest) returns (RevokeInviteLinkResponse) {
+        option (google.api.http) = {
+            delete: "/v1/community-invites/{token}"
+        };
+    }
+
+    rpc JoinByInvite(JoinByInviteRequest) returns (JoinByInviteResponse) {
+        option (google.api.http) = {
+            post: "/v1/community-invites/{token}/join"
+            body: "*"
+        };
+    }
+
+    rpc MarkCommunityMessagesViewed(MarkCommunityMessagesViewedRequest) returns (MarkCommunityMessagesViewedResponse) {
+        option (google.api.http) = {
+            post: "/v1/communities/{post_id}/views"
+            body: "*"
         };
     }
 }

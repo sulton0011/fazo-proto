@@ -18,6 +18,9 @@ message Comment {
     string reactions               = 9  [json_name = "reactions"];   // JSON string: {"👍":["user_id1",...]}
     int64 created_at               = 10 [json_name = "created_at"];
     repeated MediaMeta media_meta  = 11 [json_name = "media_meta"];  // media o'lchamlari; eski izohlarda bo'sh
+    // Unique viewers (author included) — Global community messages only
+    // (CommunityService.MarkCommunityMessagesViewed); 0 for other posts.
+    int64 views                    = 12 [json_name = "views"];
 }
 
 message CreateCommentRequest {
