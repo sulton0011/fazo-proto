@@ -3,30 +3,49 @@ syntax = "proto3";
 package fazo.v1;
 
 import "fazo/v1/auth_types.proto";
+import "fazo/v1/chat_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
 // Contact is a registered user saved in the caller's contact list under a
-// name the caller chose (like a phone book entry).
+// name the caller chose (like a phone book entry). A contact is saved either
+// by phone (AddContact.phone, ImportContacts) or by user (AddContact.user_id /
+// username) — then the user's phone is never shown (phone_hidden).
 message Contact {
-    User user          = 1 [json_name = "user"];        // profile_pics is always empty here
-    string phone       = 2 [json_name = "phone"];       // +998XXXXXXXXX
+    User user          = 1 [json_name = "user"];        // profile_pics is always empty here (see avatar_url); user.phone empty when phone_hidden
+    string phone       = 2 [json_name = "phone"];       // E.164 (+998XXXXXXXXX, +7..., ...); "" when phone_hidden
     string first_name  = 3 [json_name = "first_name"];  // name given by the caller
     string last_name   = 4 [json_name = "last_name"];
     bool is_mutual     = 5 [json_name = "is_mutual"];   // the user has the caller in their contacts too
     int64 created_at   = 6 [json_name = "created_at"];  // Unix seconds
+    // Latest profile picture URL ("" = none), like avatar_url elsewhere.
+    string avatar_url  = 7 [json_name = "avatar_url"];
+    // Online / last seen with the "Hamma / Hech kim" rules applied
+    // (same as UserService.GetPresence). Unset when unknown.
+    PresenceEvent presence = 8 [json_name = "presence"];
+    // Saved by user (not by phone): phone and user.phone are empty. Use
+    // user.id for UpdateContact.user_id / DeleteContacts.user_ids.
+    bool phone_hidden  = 9 [json_name = "phone_hidden"];
 }
 
 message ContactInput {
-    string phone      = 1 [json_name = "phone"];       // +998XXXXXXXXX, 998XXXXXXXXX or XXXXXXXXX; spaces, dashes, brackets are stripped
+    // E.164 (+ and 8-15 digits, any country; 00 prefix = +), or the Uzbek
+    // short forms 998XXXXXXXXX / XXXXXXXXX; spaces, dashes, dots, brackets are stripped.
+    string phone      = 1 [json_name = "phone"];
     string first_name = 2 [json_name = "first_name"];
     string last_name  = 3 [json_name = "last_name"];
 }
 
+// Exactly one of phone, user_id, username.
 message AddContactRequest {
     string phone      = 1 [json_name = "phone"];
     string first_name = 2 [json_name = "first_name"];  // required, max 64 chars
     string last_name  = 3 [json_name = "last_name"];   // optional, max 64 chars
+    // Add a Fazo user without knowing their phone (from a profile / chat).
+    // The contact is linked to the user; their phone stays hidden.
+    string user_id    = 4 [json_name = "user_id"];
+    // Same as user_id, by username ("@" optional, case-insensitive).
+    string username   = 5 [json_name = "username"];
 }
 
 message AddContactResponse {
@@ -49,20 +68,60 @@ message GetContactsResponse {
     repeated Contact contacts = 1 [json_name = "contacts"];  // only registered users, sorted by first_name, last_name
 }
 
+// phone or user_id (user_id works for every contact, phone_hidden ones too).
 message UpdateContactRequest {
     string phone      = 1 [json_name = "phone"];
     string first_name = 2 [json_name = "first_name"];  // required, max 64 chars
     string last_name  = 3 [json_name = "last_name"];
+    string user_id    = 4 [json_name = "user_id"];
 }
 
 message UpdateContactResponse {
     Contact contact = 1 [json_name = "contact"];
 }
 
+// phones and / or user_ids (together max 500 per request). A user_id
+// removes every entry of that user (by phone and by user).
 message DeleteContactsRequest {
-    repeated string phones = 1 [json_name = "phones"];  // max 500 per request
+    repeated string phones   = 1 [json_name = "phones"];
+    repeated string user_ids = 2 [json_name = "user_ids"];
 }
 
 message DeleteContactsResponse {
     int32 deleted = 1 [json_name = "deleted"];
+}
+
+// Minimal public profile returned by LookupPhone.
+message PhoneLookupUser {
+    string id         = 1 [json_name = "id"];
+    string full_name  = 2 [json_name = "full_name"];
+    string username   = 3 [json_name = "username"];
+    string avatar_url = 4 [json_name = "avatar_url"];
+}
+
+message LookupPhoneRequest {
+    string phone = 1 [json_name = "phone"];  // same formats as ContactInput.phone
+}
+
+message LookupPhoneResponse {
+    // false: no Fazo user with this verified phone, or the user turned
+    // findable_by_phone off (and does not have the caller in their contacts).
+    bool found           = 1 [json_name = "found"];
+    PhoneLookupUser user = 2 [json_name = "user"];
+}
+
+message GetContactSettingsRequest {}
+
+message GetContactSettingsResponse {
+    // Others can find the caller by phone (LookupPhone, AddContact.phone,
+    // phone book import). Default true.
+    bool findable_by_phone = 1 [json_name = "findable_by_phone"];
+}
+
+message SetFindableByPhoneRequest {
+    bool findable_by_phone = 1 [json_name = "findable_by_phone"];
+}
+
+message SetFindableByPhoneResponse {
+    bool findable_by_phone = 1 [json_name = "findable_by_phone"];
 }

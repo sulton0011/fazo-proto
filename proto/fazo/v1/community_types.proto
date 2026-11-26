@@ -275,3 +275,31 @@ message MarkCommunityMessagesViewedResponse {
     // Current counts of the existing (not deleted) requested messages.
     repeated CommunityMessageViews views = 1 [json_name = "views"];
 }
+
+// Why a community write (CommentService.CreateComment / UpdateComment in a
+// Global community) was rejected. Attached as a Connect error detail.
+enum CommunityErrorReason {
+    COMMUNITY_ERROR_REASON_UNSPECIFIED       = 0;
+    // Slow mode: wait retry_after_seconds (ResourceExhausted).
+    COMMUNITY_ERROR_REASON_SLOW_MODE         = 1;
+    // Muted by an admin until muted_until (PermissionDenied).
+    COMMUNITY_ERROR_REASON_MUTED             = 2;
+    COMMUNITY_ERROR_REASON_BANNED            = 3;
+    // Group member only: join first (FailedPrecondition).
+    COMMUNITY_ERROR_REASON_NOT_MEMBER        = 4;
+    // Channel: only the owner and admins post (PermissionDenied).
+    COMMUNITY_ERROR_REASON_ADMINS_ONLY       = 5;
+    COMMUNITY_ERROR_REASON_MEDIA_NOT_ALLOWED = 6;
+    COMMUNITY_ERROR_REASON_LINKS_NOT_ALLOWED = 7;
+}
+
+message CommunityErrorDetail {
+    CommunityErrorReason reason = 1 [json_name = "reason"];
+    // SLOW_MODE: seconds until the next message is allowed (>= 1). Also set
+    // for MUTED (seconds until muted_until).
+    int64 retry_after_seconds   = 2 [json_name = "retry_after_seconds"];
+    // MUTED: unix seconds when the mute ends.
+    int64 muted_until           = 3 [json_name = "muted_until"];
+    // SLOW_MODE: the group's slow mode step.
+    int32 slow_mode_seconds     = 4 [json_name = "slow_mode_seconds"];
+}

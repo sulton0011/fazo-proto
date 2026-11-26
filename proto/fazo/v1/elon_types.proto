@@ -75,6 +75,14 @@ message ListAdsRequest {
     // Ads of one user; the user's own list also shows their pending /
     // expired / rejected ads when creator_id is the caller.
     string creator_id          = 16 [json_name = "creator_id"];
+    // Job ads: JobDetails.experience equals this (UNSPECIFIED = any).
+    ExperienceLevel experience_level = 17 [json_name = "experience_level"];
+    // Job ads paying at least this much (whole units of salary_currency):
+    // salary_max >= salary_from, or only salary_min given and >= salary_from,
+    // or salary_negotiable. Job ads without any salary are excluded.
+    optional int64 salary_from = 18 [json_name = "salary_from"];
+    // ISO 4217 of salary_from; default "UZS". Negotiable ads match any.
+    string salary_currency     = 19 [json_name = "salary_currency"];
 }
 
 message ListAdsResponse {
@@ -139,6 +147,11 @@ message UpdateAdRequest {
     JobDetails job               = 10 [json_name = "job"];
     // "" = keep; "-" = detach the company.
     string company_id            = 11 [json_name = "company_id"];
+    // replace_media = true replaces the ad's media with media_ids (in this
+    // order; empty list = remove all). Same rules as CreateAd.media_ids.
+    // false keeps the stored media (media_ids ignored).
+    bool replace_media           = 12 [json_name = "replace_media"];
+    repeated string media_ids    = 13 [json_name = "media_ids"];
 }
 
 message UpdateAdResponse {
