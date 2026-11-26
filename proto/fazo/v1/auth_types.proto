@@ -110,14 +110,32 @@ message PremiumProfile {
     // Video avatar: the file's object key, resolved like profile_pics urls
     // (CDN base + key); "" = none.
     string video_avatar_url        = 7 [json_name = "video_avatar_url"];
-    // Up to 2 emoji or a short text (<= 16 characters).
+    // Username sticker shown after the @username: a sticker id such as
+    // "os12" or one emoji / ZWJ sequence; single line, <= 24 characters.
     string emoji_status            = 8 [json_name = "emoji_status"];
-    // gift_catalog id of an owned gift used as the status; "" = none.
+    // gift_catalog id of an owned gift used as the username sticker; "" = none.
     string emoji_status_gift_id    = 9 [json_name = "emoji_status_gift_id"];
     // user_gifts ids pinned to the profile, at most 3.
     repeated string showcase_gift_ids = 10 [json_name = "showcase_gift_ids"];
     // showcase_gift_ids resolved (gifts no longer owned are left out).
     repeated UserGiftBrief showcase   = 11 [json_name = "showcase"];
+    // Featured items shown animated next to the avatar, at most 5, in the
+    // owner's order. Items the user no longer owns are left out.
+    repeated FeaturedItem featured    = 12 [json_name = "featured"];
+}
+
+// An item the user owns, featured next to the avatar (premium only).
+message FeaturedItem {
+    // "gift" | "username".
+    string kind          = 1 [json_name = "kind"];
+    // user_gifts.id for a gift, the username (without "@") for a username.
+    string ref           = 2 [json_name = "ref"];
+    // Gift name, or "@username".
+    string name          = 3 [json_name = "name"];
+    // Gift animation (Lottie JSON); empty for usernames.
+    string animation_url = 4 [json_name = "animation_url"];
+    // gift_catalog id for gifts; empty for usernames.
+    string gift_id       = 5 [json_name = "gift_id"];
 }
 
 // LastSeenPrivacy — oxirgi faollik (onlayn / oxirgi marta) kimga ko'rinadi.
