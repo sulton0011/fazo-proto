@@ -16,7 +16,7 @@ message MediaMeta {
     int32 duration_ms = 5 [json_name = "duration_ms"];  // 0..3 600 000 (video/voice)
     bytes waveform    = 6 [json_name = "waveform"];     // voice: ≤128 namuna, har biri 0..255
     // video (video xabar ham "video"): yuboruvchi yuklagan poster rasm (birinchi kadr).
-    // Bizning storage dagi kalit ("images/…", "thumbnails/…") yoki video url i bilan
+    // Bizning storage dagi kalit ("photos/…", "images/…", "thumbnails/…") yoki video url i bilan
     // bir xil origin dagi to'liq URL bo'lishi shart, aks holda server tashlaydi.
     string thumb_url  = 7 [json_name = "thumb_url"];
     // image/video: yuklanmasdan oldin darhol chiziladigan kichik preview
