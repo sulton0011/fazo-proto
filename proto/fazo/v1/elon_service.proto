@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/elon_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// ElonService — classified ads (Elon page): categories, search, jobs and
+// internships, companies, job applications and Zenit-paid promotion.
+// All methods require a signed-in user. Paid methods (PromoteAd, PayJobPost)
+// also need a phone-verified wallet and a wallet_token (UnlockWallet).
+service ElonService {
+    rpc ListAdCategories(ListAdCategoriesRequest) returns (ListAdCategoriesResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/categories"
+        };
+    }
+
+    rpc ListAds(ListAdsRequest) returns (ListAdsResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/ads"
+        };
+    }
+
+    rpc GetAd(GetAdRequest) returns (GetAdResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/ads/{ad_id}"
+        };
+    }
+
+    rpc CreateAd(CreateAdRequest) returns (CreateAdResponse) {
+        option (google.api.http) = {
+            post: "/v1/elon/ads"
+            body: "*"
+        };
+    }
+
+    rpc UpdateAd(UpdateAdRequest) returns (UpdateAdResponse) {
+        option (google.api.http) = {
+            patch: "/v1/elon/ads/{ad_id}"
+            body: "*"
+        };
+    }
+
+    rpc ListPromotionPrices(ListPromotionPricesRequest) returns (ListPromotionPricesResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/promotion-prices"
+        };
+    }
+
+    rpc PromoteAd(PromoteAdRequest) returns (PromoteAdResponse) {
+        option (google.api.http) = {
+            post: "/v1/elon/ads/{ad_id}/promote"
+            body: "*"
+        };
+    }
+
+    rpc PayJobPost(PayJobPostRequest) returns (PayJobPostResponse) {
+        option (google.api.http) = {
+            post: "/v1/elon/ads/{ad_id}/pay"
+            body: "*"
+        };
+    }
+
+    rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {
+        option (google.api.http) = {
+            post: "/v1/elon/companies"
+            body: "*"
+        };
+    }
+
+    rpc UpdateCompany(UpdateCompanyRequest) returns (UpdateCompanyResponse) {
+        option (google.api.http) = {
+            patch: "/v1/elon/companies/{company_id}"
+            body: "*"
+        };
+    }
+
+    rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/companies/{company_id}"
+        };
+    }
+
+    rpc ListMyCompanies(ListMyCompaniesRequest) returns (ListMyCompaniesResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/my/companies"
+        };
+    }
+
+    rpc ApplyToJob(ApplyToJobRequest) returns (ApplyToJobResponse) {
+        option (google.api.http) = {
+            post: "/v1/elon/ads/{ad_id}/applications"
+            body: "*"
+        };
+    }
+
+    rpc ListJobApplications(ListJobApplicationsRequest) returns (ListJobApplicationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/ads/{ad_id}/applications"
+        };
+    }
+
+    rpc UpdateJobApplicationStatus(UpdateJobApplicationStatusRequest) returns (UpdateJobApplicationStatusResponse) {
+        option (google.api.http) = {
+            patch: "/v1/elon/applications/{application_id}"
+            body: "*"
+        };
+    }
+
+    rpc ListMyApplications(ListMyApplicationsRequest) returns (ListMyApplicationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/elon/my/applications"
+        };
+    }
+}

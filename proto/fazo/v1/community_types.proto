@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/post_extras.proto";
+import "fazo/v1/post_types.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Global communities are Posts of type POST_TYPE_GLOBAL_CHAT (public, or
+// closed: only accepted access requests can see them). Community data is in
+// Post.community (CommunityInfo).
+
+enum CommunitySort {
+    COMMUNITY_SORT_MEMBERS  = 0;  // members_count desc
+    COMMUNITY_SORT_ACTIVITY = 1;  // last_activity_at desc
+    COMMUNITY_SORT_NEWEST   = 2;  // created_at desc
+}
+
+message ListCommunitiesRequest {
+    CommunityCategory category = 1 [json_name = "category"];   // UNSPECIFIED = all
+    // Case-insensitive substring of the title.
+    string query               = 2 [json_name = "query"];
+    CommunitySort sort         = 3 [json_name = "sort"];
+    string cursor              = 4 [json_name = "cursor"];     // opaque
+    int32 page_size            = 5 [json_name = "page_size"];  // default 20, max 50
+    bool official_only         = 6 [json_name = "official_only"];
+}
+
+message ListCommunitiesResponse {
+    // Official communities first, then by sort. access_status is filled as
+    // in GetAllPosts.
+    repeated Post communities = 1 [json_name = "communities"];
+    string next_cursor        = 2 [json_name = "next_cursor"];
+    bool has_more             = 3 [json_name = "has_more"];
+}
+
+message RecommendedCommunity {
+    Post community = 1 [json_name = "community"];
+    // "same_category" (matches a university / school / company community the
+    // caller is in) | "popular"
+    string reason  = 2 [json_name = "reason"];
+}
+
+message GetCommunityRecommendationsRequest {
+    int32 limit = 1 [json_name = "limit"];  // default 10, max 30
+}
+
+message GetCommunityRecommendationsResponse {
+    // "Siz uchun": never includes communities the caller is in.
+    repeated RecommendedCommunity communities = 1 [json_name = "communities"];
+}

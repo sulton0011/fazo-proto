@@ -35,6 +35,10 @@ enum WalletTxKind {
     WALLET_TX_KIND_RECEIVE_ZENIT = 10;
     // Fazo Premium bought (amount < 0; ref_id = plan id).
     WALLET_TX_KIND_BUY_PREMIUM   = 11;
+    // Elon ad promotion (bump / top; amount < 0; ref_id = ad id, note = type).
+    WALLET_TX_KIND_PROMOTE_AD    = 12;
+    // Job ad posting fee (amount < 0; ref_id = ad id, note = type).
+    WALLET_TX_KIND_JOB_POST      = 13;
 }
 
 message Wallet {

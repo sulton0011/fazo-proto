@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/community_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// CommunityService — the Global page: community lists with category filter,
+// official badge, activity and "Siz uchun" recommendations. Creating,
+// editing and joining communities stays in PostService (CreatePost type
+// GLOBAL_CHAT, RequestPostAccess, ...). Auth: required.
+service CommunityService {
+    rpc ListCommunities(ListCommunitiesRequest) returns (ListCommunitiesResponse) {
+        option (google.api.http) = {
+            get: "/v1/communities"
+        };
+    }
+
+    rpc GetCommunityRecommendations(GetCommunityRecommendationsRequest) returns (GetCommunityRecommendationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/communities/recommendations"
+        };
+    }
+}

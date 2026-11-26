@@ -1,0 +1,346 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/chat_types.proto";
+import "fazo/v1/file_types.proto";
+import "fazo/v1/post_extras.proto";
+import "fazo/v1/post_types.proto";
+import "fazo/v1/wallet_types.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Elon = classified ads. An ad is a Post of type POST_TYPE_SHOP_CHAT; the
+// ad-only fields are Post fields 17-28. Prices: Post.price keeps the unit the
+// app already writes (amount × 100 of Post.currency).
+
+// ── Categories ──────────────────────────────────────────────────────────────
+
+message AdCategory {
+    int32 id            = 1 [json_name = "id"];
+    string slug         = 2 [json_name = "slug"];
+    string name_uz      = 3 [json_name = "name_uz"];
+    string name_ru      = 4 [json_name = "name_ru"];
+    string name_en      = 5 [json_name = "name_en"];
+    // Client icon key (e.g. "briefcase", "car").
+    string icon         = 6 [json_name = "icon"];
+    int32 sort          = 7 [json_name = "sort"];
+    AdCategoryKind kind = 8 [json_name = "kind"];
+    // Promotion price type a new ad must pay before it is visible (jobs:
+    // "job_post_7d"); empty = free to post.
+    string posting_fee_type = 9  [json_name = "posting_fee_type"];
+    // Zenit price of posting_fee_type; 0 when free.
+    int64 posting_fee       = 10 [json_name = "posting_fee"];
+}
+
+message ListAdCategoriesRequest {}
+
+message ListAdCategoriesResponse {
+    // Sorted by sort. "Hammasi" (all) is client-side: category_id 0.
+    repeated AdCategory categories = 1 [json_name = "categories"];
+}
+
+// ── Listing ─────────────────────────────────────────────────────────────────
+
+enum AdSort {
+    AD_SORT_NEWEST     = 0;  // ranked_at (creation or last bump) desc
+    AD_SORT_PRICE_ASC  = 1;
+    AD_SORT_PRICE_DESC = 2;
+    // likes × 3 + views, desc
+    AD_SORT_POPULAR    = 3;
+}
+
+message ListAdsRequest {
+    int32 category_id          = 1  [json_name = "category_id"];  // 0 = all (Hammasi)
+    // Case-insensitive substring of title or description.
+    string query               = 2  [json_name = "query"];
+    // Same unit as Post.price; inclusive.
+    optional int64 price_min   = 3  [json_name = "price_min"];
+    optional int64 price_max   = 4  [json_name = "price_max"];
+    string region              = 5  [json_name = "region"];        // exact, case-insensitive
+    string city                = 6  [json_name = "city"];          // exact, case-insensitive
+    AdCondition condition      = 7  [json_name = "condition"];
+    AdSort sort                = 8  [json_name = "sort"];
+    // Opaque; empty for the first page.
+    string cursor              = 9  [json_name = "cursor"];
+    int32 page_size            = 10 [json_name = "page_size"];     // default 20, max 50
+    // ISO 4217; with a price filter it defaults to "UZS".
+    string currency            = 11 [json_name = "currency"];
+    // Category kind filter (e.g. JOB for the jobs tab); ignored when
+    // category_id is set.
+    AdCategoryKind kind        = 12 [json_name = "kind"];
+    EmploymentType employment_type = 13 [json_name = "employment_type"];
+    WorkFormat work_format     = 14 [json_name = "work_format"];
+    string company_id          = 15 [json_name = "company_id"];
+    // Ads of one user; the user's own list also shows their pending /
+    // expired / rejected ads when creator_id is the caller.
+    string creator_id          = 16 [json_name = "creator_id"];
+}
+
+message ListAdsResponse {
+    // Top ads (is_top) come first, in a fair rotation, then the rest in the
+    // requested order.
+    repeated Post ads   = 1 [json_name = "ads"];
+    string next_cursor  = 2 [json_name = "next_cursor"];
+    bool has_more       = 3 [json_name = "has_more"];
+}
+
+message GetAdRequest {
+    string ad_id = 1 [json_name = "ad_id"];
+}
+
+message GetAdResponse {
+    Post ad                        = 1 [json_name = "ad"];
+    // Job ads: the caller's application, if any.
+    JobApplication my_application  = 2 [json_name = "my_application"];
+}
+
+// ── Create / update ─────────────────────────────────────────────────────────
+
+message CreateAdRequest {
+    // Optional client ULID (offline create); server generates when empty.
+    string id                  = 1  [json_name = "id"];
+    string title               = 2  [json_name = "title"];
+    string description         = 3  [json_name = "description"];
+    repeated string media_ids  = 4  [json_name = "media_ids"];
+    repeated string tags       = 5  [json_name = "tags"];
+    // Same unit as Post.price. Required (> 0) except for job ads.
+    int64 price                = 6  [json_name = "price"];
+    string currency            = 7  [json_name = "currency"];      // default "UZS"
+    int32 category_id          = 8  [json_name = "category_id"];   // required
+    string region              = 9  [json_name = "region"];
+    string city                = 10 [json_name = "city"];
+    AdCondition condition      = 11 [json_name = "condition"];
+    // Required when the category kind is JOB (position is required).
+    JobDetails job             = 12 [json_name = "job"];
+    // Post the job as this company (must be the caller's).
+    string company_id          = 13 [json_name = "company_id"];
+}
+
+message CreateAdResponse {
+    // ad_status is PENDING_PAYMENT when the category has a posting fee.
+    Post ad          = 1 [json_name = "ad"];
+    // Zenit due before the ad is visible (PayJobPost); 0 when it is live.
+    int64 amount_due = 2 [json_name = "amount_due"];
+}
+
+message UpdateAdRequest {
+    string ad_id                 = 1  [json_name = "ad_id"];
+    optional string title        = 2  [json_name = "title"];
+    optional string description  = 3  [json_name = "description"];
+    optional int64 price         = 4  [json_name = "price"];
+    optional string currency     = 5  [json_name = "currency"];
+    // Can move between non-job categories only.
+    optional int32 category_id   = 6  [json_name = "category_id"];
+    optional string region       = 7  [json_name = "region"];
+    optional string city         = 8  [json_name = "city"];
+    optional AdCondition condition = 9 [json_name = "condition"];
+    // Replaces the job details when set.
+    JobDetails job               = 10 [json_name = "job"];
+    // "" = keep; "-" = detach the company.
+    string company_id            = 11 [json_name = "company_id"];
+}
+
+message UpdateAdResponse {
+    Post ad = 1 [json_name = "ad"];
+}
+
+// ── Promotion (Zenit) ───────────────────────────────────────────────────────
+
+message PromotionPrice {
+    // "bump", "top_3d", "top_7d", "job_post_7d", ...
+    string type         = 1 [json_name = "type"];
+    // "bump" | "top" | "publish"
+    string action       = 2 [json_name = "action"];
+    int64 price         = 3 [json_name = "price"];          // Zenit
+    int32 duration_days = 4 [json_name = "duration_days"];
+    string title_uz     = 5 [json_name = "title_uz"];
+    string title_ru     = 6 [json_name = "title_ru"];
+    string title_en     = 7 [json_name = "title_en"];
+}
+
+message ListPromotionPricesRequest {}
+
+message ListPromotionPricesResponse {
+    repeated PromotionPrice prices = 1 [json_name = "prices"];
+    // Premium perk: the caller may bump one ad free now.
+    bool free_bump_available       = 2 [json_name = "free_bump_available"];
+    // When the next free bump opens (unix s); 0 when available now or the
+    // caller has no Premium.
+    int64 free_bump_next_at        = 3 [json_name = "free_bump_next_at"];
+}
+
+message PromoteAdRequest {
+    string ad_id           = 1 [json_name = "ad_id"];
+    // A PromotionPrice.type with action "bump" or "top".
+    string type            = 2 [json_name = "type"];
+    // From WalletService.UnlockWallet; not needed for a free bump.
+    string wallet_token    = 3 [json_name = "wallet_token"];
+    // Client-generated, unique per attempt; a retry returns the first result.
+    string idempotency_key = 4 [json_name = "idempotency_key"];
+    // Use the Premium weekly free bump (type must be "bump").
+    bool use_free_bump     = 5 [json_name = "use_free_bump"];
+}
+
+message PromoteAdResponse {
+    Post ad             = 1 [json_name = "ad"];
+    // Unset for a free bump.
+    Wallet wallet       = 2 [json_name = "wallet"];
+    int64 charged       = 3 [json_name = "charged"];
+    bool free_bump_used = 4 [json_name = "free_bump_used"];
+}
+
+message PayJobPostRequest {
+    string ad_id           = 1 [json_name = "ad_id"];
+    string wallet_token    = 2 [json_name = "wallet_token"];
+    string idempotency_key = 3 [json_name = "idempotency_key"];
+}
+
+message PayJobPostResponse {
+    Post ad       = 1 [json_name = "ad"];
+    Wallet wallet = 2 [json_name = "wallet"];
+    int64 charged = 3 [json_name = "charged"];
+}
+
+// ── Companies ───────────────────────────────────────────────────────────────
+
+message Company {
+    string id         = 1 [json_name = "id"];
+    string owner_id   = 2 [json_name = "owner_id"];
+    string name       = 3 [json_name = "name"];
+    string logo_url   = 4 [json_name = "logo_url"];
+    string about      = 5 [json_name = "about"];
+    string website    = 6 [json_name = "website"];
+    // Set by Fazo admins only.
+    bool verified     = 7 [json_name = "verified"];
+    int64 created_at  = 8 [json_name = "created_at"];
+    int64 updated_at  = 9 [json_name = "updated_at"];
+    // Visible job ads of the company (GetCompany only).
+    int64 open_jobs   = 10 [json_name = "open_jobs"];
+}
+
+message CreateCompanyRequest {
+    string name     = 1 [json_name = "name"];      // 1-100 chars
+    string logo_url = 2 [json_name = "logo_url"];
+    string about    = 3 [json_name = "about"];     // up to 2000 chars
+    string website  = 4 [json_name = "website"];   // http(s) URL or empty
+}
+
+message CreateCompanyResponse {
+    Company company = 1 [json_name = "company"];
+}
+
+message UpdateCompanyRequest {
+    string company_id        = 1 [json_name = "company_id"];
+    optional string name     = 2 [json_name = "name"];
+    optional string logo_url = 3 [json_name = "logo_url"];
+    optional string about    = 4 [json_name = "about"];
+    optional string website  = 5 [json_name = "website"];
+}
+
+message UpdateCompanyResponse {
+    Company company = 1 [json_name = "company"];
+}
+
+message GetCompanyRequest {
+    string company_id = 1 [json_name = "company_id"];
+}
+
+message GetCompanyResponse {
+    Company company = 1 [json_name = "company"];
+}
+
+message ListMyCompaniesRequest {}
+
+message ListMyCompaniesResponse {
+    repeated Company companies = 1 [json_name = "companies"];
+}
+
+// ── Job applications ────────────────────────────────────────────────────────
+
+enum JobApplicationStatus {
+    JOB_APPLICATION_STATUS_UNSPECIFIED = 0;
+    JOB_APPLICATION_STATUS_NEW         = 1;
+    JOB_APPLICATION_STATUS_VIEWED      = 2;
+    JOB_APPLICATION_STATUS_INTERVIEW   = 3;
+    JOB_APPLICATION_STATUS_REJECTED    = 4;
+    JOB_APPLICATION_STATUS_HIRED       = 5;
+}
+
+message JobApplication {
+    string id                   = 1  [json_name = "id"];
+    string ad_id                = 2  [json_name = "ad_id"];
+    string ad_title             = 3  [json_name = "ad_title"];
+    string applicant_id         = 4  [json_name = "applicant_id"];
+    string applicant_username   = 5  [json_name = "applicant_username"];
+    string applicant_full_name  = 6  [json_name = "applicant_full_name"];
+    string employer_id          = 7  [json_name = "employer_id"];
+    string cover_letter         = 8  [json_name = "cover_letter"];
+    FileRecord resume           = 9  [json_name = "resume"];
+    bool show_phone             = 10 [json_name = "show_phone"];
+    // Applicant phone; only when show_phone (and only to the employer / applicant).
+    string phone                = 11 [json_name = "phone"];
+    JobApplicationStatus status = 12 [json_name = "status"];
+    // The chat card message in the applicant ↔ employer chat.
+    string message_id           = 13 [json_name = "message_id"];
+    int64 created_at            = 14 [json_name = "created_at"];
+    int64 updated_at            = 15 [json_name = "updated_at"];
+    // Position from the job details (ListMyApplications convenience).
+    string position             = 16 [json_name = "position"];
+}
+
+message ApplyToJobRequest {
+    string ad_id          = 1 [json_name = "ad_id"];
+    string cover_letter   = 2 [json_name = "cover_letter"];    // up to 4000 chars
+    // Optional file_store id from the normal upload (FileService), uploaded
+    // by the caller.
+    string resume_file_id = 3 [json_name = "resume_file_id"];
+    // Show the caller's verified phone to the employer.
+    bool show_phone       = 4 [json_name = "show_phone"];
+}
+
+message ApplyToJobResponse {
+    JobApplication application = 1 [json_name = "application"];
+    // The job_application card sent to the employer.
+    Message message            = 2 [json_name = "message"];
+}
+
+message ListJobApplicationsRequest {
+    string ad_id                = 1 [json_name = "ad_id"];
+    JobApplicationStatus status = 2 [json_name = "status"];    // UNSPECIFIED = all
+    string cursor               = 3 [json_name = "cursor"];
+    int32 page_size             = 4 [json_name = "page_size"]; // default 20, max 50
+}
+
+message ListJobApplicationsResponse {
+    repeated JobApplication applications = 1 [json_name = "applications"];
+    string next_cursor                   = 2 [json_name = "next_cursor"];
+    bool has_more                        = 3 [json_name = "has_more"];
+}
+
+message UpdateJobApplicationStatusRequest {
+    string application_id       = 1 [json_name = "application_id"];
+    // VIEWED, INTERVIEW, REJECTED or HIRED.
+    JobApplicationStatus status = 2 [json_name = "status"];
+    // Optional note for the applicant (shown on the chat card), up to 500 chars.
+    string note                 = 3 [json_name = "note"];
+}
+
+message UpdateJobApplicationStatusResponse {
+    JobApplication application = 1 [json_name = "application"];
+    // The job_application_status card sent to the applicant; unset for VIEWED
+    // or when the status did not change.
+    Message message            = 2 [json_name = "message"];
+}
+
+message ListMyApplicationsRequest {
+    JobApplicationStatus status = 1 [json_name = "status"];
+    string cursor               = 2 [json_name = "cursor"];
+    int32 page_size             = 3 [json_name = "page_size"];
+}
+
+message ListMyApplicationsResponse {
+    repeated JobApplication applications = 1 [json_name = "applications"];
+    string next_cursor                   = 2 [json_name = "next_cursor"];
+    bool has_more                        = 3 [json_name = "has_more"];
+}

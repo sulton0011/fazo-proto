@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// Types embedded in Post for Elon ads (POST_TYPE_SHOP_CHAT) and Global
+// communities (POST_TYPE_GLOBAL_CHAT). They live in their own file so that
+// post_types.proto can use them without importing the request files.
+
+enum AdCondition {
+    AD_CONDITION_UNSPECIFIED = 0;
+    AD_CONDITION_NEW         = 1;
+    AD_CONDITION_USED        = 2;
+}
+
+enum AdStatus {
+    AD_STATUS_UNSPECIFIED     = 0;
+    // Visible to everyone.
+    AD_STATUS_ACTIVE          = 1;
+    // Job ad created but its posting fee is not paid yet (ElonService.PayJobPost);
+    // visible only to its owner.
+    AD_STATUS_PENDING_PAYMENT = 2;
+    // Paid period (published_until) is over; visible only to its owner until
+    // renewed with PayJobPost.
+    AD_STATUS_EXPIRED         = 3;
+    // Hidden by a moderator.
+    AD_STATUS_REJECTED        = 4;
+}
+
+enum AdCategoryKind {
+    AD_CATEGORY_KIND_UNSPECIFIED = 0;
+    AD_CATEGORY_KIND_GOODS       = 1;
+    AD_CATEGORY_KIND_JOB         = 2;
+    AD_CATEGORY_KIND_SERVICE     = 3;
+    AD_CATEGORY_KIND_REALTY      = 4;
+    AD_CATEGORY_KIND_AUTO        = 5;
+    AD_CATEGORY_KIND_OTHER       = 6;
+}
+
+enum EmploymentType {
+    EMPLOYMENT_TYPE_UNSPECIFIED = 0;
+    EMPLOYMENT_TYPE_FULL_TIME   = 1;
+    EMPLOYMENT_TYPE_PART_TIME   = 2;
+    EMPLOYMENT_TYPE_INTERNSHIP  = 3;
+    EMPLOYMENT_TYPE_PROJECT     = 4;
+}
+
+enum WorkFormat {
+    WORK_FORMAT_UNSPECIFIED = 0;
+    WORK_FORMAT_OFFICE      = 1;
+    WORK_FORMAT_REMOTE      = 2;
+    WORK_FORMAT_HYBRID      = 3;
+}
+
+enum ExperienceLevel {
+    EXPERIENCE_LEVEL_UNSPECIFIED = 0;
+    EXPERIENCE_LEVEL_NONE        = 1;
+    EXPERIENCE_LEVEL_JUNIOR      = 2;
+    EXPERIENCE_LEVEL_MIDDLE      = 3;
+    EXPERIENCE_LEVEL_SENIOR      = 4;
+}
+
+// Job / internship details of an ad whose category kind is JOB.
+message JobDetails {
+    string position                 = 1  [json_name = "position"];
+    EmploymentType employment_type  = 2  [json_name = "employment_type"];
+    WorkFormat work_format          = 3  [json_name = "work_format"];
+    // Whole currency units (so'm for UZS), 0 = not given.
+    int64 salary_min                = 4  [json_name = "salary_min"];
+    int64 salary_max                = 5  [json_name = "salary_max"];
+    // ISO 4217, default "UZS".
+    string salary_currency          = 6  [json_name = "salary_currency"];
+    bool salary_negotiable          = 7  [json_name = "salary_negotiable"];
+    string city                     = 8  [json_name = "city"];
+    ExperienceLevel experience      = 9  [json_name = "experience"];
+    repeated string requirements    = 10 [json_name = "requirements"];
+    repeated string benefits        = 11 [json_name = "benefits"];
+    // Free-text employer name when the job is not posted as a company.
+    string company_name             = 12 [json_name = "company_name"];
+}
+
+message CompanySummary {
+    string id       = 1 [json_name = "id"];
+    string name     = 2 [json_name = "name"];
+    string logo_url = 3 [json_name = "logo_url"];
+    // Set by Fazo admins only.
+    bool verified   = 4 [json_name = "verified"];
+}
+
+enum CommunityCategory {
+    COMMUNITY_CATEGORY_UNSPECIFIED = 0;
+    COMMUNITY_CATEGORY_UNIVERSITY  = 1;
+    COMMUNITY_CATEGORY_SCHOOL      = 2;
+    COMMUNITY_CATEGORY_COMPANY     = 3;
+    COMMUNITY_CATEGORY_INTEREST    = 4;
+    COMMUNITY_CATEGORY_CITY        = 5;
+    COMMUNITY_CATEGORY_OTHER       = 6;
+}
+
+// Global community data of a POST_TYPE_GLOBAL_CHAT post.
+message CommunityInfo {
+    CommunityCategory category = 1 [json_name = "category"];
+    // Official verified community (set by Fazo admins only).
+    bool is_official           = 2 [json_name = "is_official"];
+    // e.g. "Rasmiy universitet"; empty unless is_official.
+    string official_label      = 3 [json_name = "official_label"];
+    // Chip text for the row (replaces the generic "User" chip): the
+    // official_label for official communities, else the category name (uz).
+    string kind_label          = 4 [json_name = "kind_label"];
+    int64 members_count        = 5 [json_name = "members_count"];
+    // Distinct members who wrote in the last 24 h (cached up to 10 min).
+    // Filled by CommunityService lists only; 0 elsewhere.
+    int64 active_today         = 6 [json_name = "active_today"];
+    // The caller is the owner, an accepted member or has written in it.
+    // Filled by CommunityService only.
+    bool is_member             = 7 [json_name = "is_member"];
+    int64 last_activity_at     = 8 [json_name = "last_activity_at"];
+}

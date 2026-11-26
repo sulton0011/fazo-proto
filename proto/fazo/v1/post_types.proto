@@ -4,6 +4,7 @@ package fazo.v1;
 
 import "fazo/v1/file_types.proto";
 import "fazo/v1/post_access_request_types.proto";
+import "fazo/v1/post_extras.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
 
@@ -33,6 +34,30 @@ message Post {
     // everyone, on other posts only for the author (otherwise 0).
     int64 view_count                 = 15 [json_name = "view_count"];
     bool views_visible               = 16 [json_name = "views_visible"];
+
+    // ── Elon ad fields (POST_TYPE_SHOP_CHAT; zero values on other types) ──
+    // ElonService.ListAdCategories id; 0 = uncategorised.
+    int32 category_id                = 17 [json_name = "category_id"];
+    // A paid Top promotion is running (top_until > now).
+    bool is_top                      = 18 [json_name = "is_top"];
+    int64 top_until                  = 19 [json_name = "top_until"];
+    // Last bump (PromoteAd type "bump"); 0 = never.
+    int64 bumped_at                  = 20 [json_name = "bumped_at"];
+    string region                    = 21 [json_name = "region"];
+    string city                      = 22 [json_name = "city"];
+    AdCondition condition            = 23 [json_name = "condition"];
+    // Set when the category kind is JOB.
+    JobDetails job                   = 24 [json_name = "job"];
+    // Employer company (job ads posted as a company); filled by ElonService.
+    CompanySummary company           = 25 [json_name = "company"];
+    AdStatus ad_status               = 26 [json_name = "ad_status"];
+    // Job ads: end of the paid publication period (unix s); 0 = no limit.
+    int64 published_until            = 27 [json_name = "published_until"];
+    // ISO 4217 currency of price (default "UZS").
+    string currency                  = 28 [json_name = "currency"];
+
+    // ── Global community fields (POST_TYPE_GLOBAL_CHAT only) ──
+    CommunityInfo community          = 29 [json_name = "community"];
 }
 
 message CreatePostRequest {
@@ -45,6 +70,8 @@ message CreatePostRequest {
     PostType type             = 7 [json_name = "type"];          // default: POST_TYPE_GLOBAL_CHAT
     optional bool is_public   = 8 [json_name = "is_public"];          // null = default true, false = private
     int64 price               = 9 [json_name = "price"];              // shop_chat da majburiy (> 0)
+    // global_chat only; UNSPECIFIED = other.
+    CommunityCategory community_category = 10 [json_name = "community_category"];
 }
 
 message CreatePostResponse {
@@ -81,6 +108,8 @@ message UpdatePostRequest {
     repeated string tags     = 4 [json_name = "tags"];
     optional bool is_public  = 5 [json_name = "is_public"];   // null = o'zgartirmaslik
     int64 price              = 6 [json_name = "price"];
+    // global_chat only; UNSPECIFIED = unchanged.
+    CommunityCategory community_category = 7 [json_name = "community_category"];
 }
 
 message UpdatePostResponse {
