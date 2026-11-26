@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+import "fazo/v1/call_types.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// 1:1 voice/video call signalling. Every RPC needs a JWT.
+service CallService {
+    rpc GetIceServers(GetIceServersRequest) returns (GetIceServersResponse) {
+        option (google.api.http) = { get: "/v1/calls/ice-servers" };
+    }
+    rpc StartCall(StartCallRequest) returns (StartCallResponse) {
+        option (google.api.http) = { post: "/v1/calls" body: "*" };
+    }
+    rpc SendCallSignal(SendCallSignalRequest) returns (SendCallSignalResponse) {
+        option (google.api.http) = { post: "/v1/calls/{call_id}/signal" body: "*" };
+    }
+    rpc ListCallLog(ListCallLogRequest) returns (ListCallLogResponse) {
+        option (google.api.http) = { get: "/v1/calls/log" };
+    }
+    rpc DeleteCallLogEntry(DeleteCallLogEntryRequest) returns (DeleteCallLogEntryResponse) {
+        option (google.api.http) = { delete: "/v1/calls/log/{call_id}" };
+    }
+}

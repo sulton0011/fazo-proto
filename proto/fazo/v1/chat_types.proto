@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package fazo.v1;
 
+import "fazo/v1/call_types.proto";
 import "fazo/v1/file_types.proto";
 
 option go_package = "fazo-service/gen/fazo/v1;fazov1";
@@ -136,6 +137,10 @@ message StreamMessagesRequest {
     // hamda ochiq turgan vaqtda foydalanuvchi "onlayn" hisoblanadi.
     // Eski ilovalar bu maydonni yubormaydi → stream avvalgidek ishlaydi.
     bool want_activity = 2 [json_name = "want_activity"];
+    // want_calls — true bo'lsa stream CallSignal (qo'ng'iroq signallari) ni ham
+    // yuboradi. Klient buni faqat bitta streamda yoqishi kerak (tavsiya:
+    // StreamChatList), aks holda signal ikki marta keladi.
+    bool want_calls = 3 [json_name = "want_calls"];
 }
 
 // EditEvent — xabar tahrirlandi
@@ -166,6 +171,8 @@ message ChatEvent {
         ReadReceipt   read_receipt = 4;
         ActivityEvent activity     = 5 [json_name = "activity"];
         PresenceEvent presence     = 6 [json_name = "presence"];
+        // Faqat want_calls=true bilan ochilgan streamga keladi.
+        CallSignal    call_signal  = 7 [json_name = "call_signal"];
     }
 }
 
@@ -179,6 +186,9 @@ message ChatListUpdate {
     int64         unread_count = 3 [json_name = "unread_count"];
     PresenceEvent presence     = 4 [json_name = "presence"];
     ActivityEvent activity     = 5 [json_name = "activity"];
+    // Qo'ng'iroq signali — faqat want_calls=true bilan ochilgan streamga keladi
+    // (last_message bo'sh, unread_count 0 — presence event kabi).
+    CallSignal    call_signal  = 6 [json_name = "call_signal"];
 }
 
 // StreamChatListRequest — filter yo'q, barcha chatlardan update keladi
@@ -188,6 +198,9 @@ message StreamChatListRequest {
     // turgan vaqtda foydalanuvchi "onlayn" hisoblanadi. Eski ilovalar bu maydonni
     // yubormaydi → stream avvalgidek ishlaydi.
     bool want_presence = 1 [json_name = "want_presence"];
+    // want_calls — true bo'lsa stream qo'ng'iroq signallarini (call_signal) ham
+    // yuboradi. Eski ilovalar yubormaydi → hech qanday call_signal kelmaydi.
+    bool want_calls = 2 [json_name = "want_calls"];
 }
 
 // --- Presence va activity ---

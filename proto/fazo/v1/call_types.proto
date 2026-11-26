@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package fazo.v1;
+
+option go_package = "fazo-service/gen/fazo/v1;fazov1";
+
+// 1:1 voice/video calls. Media never touches the server: the two apps talk
+// WebRTC peer-to-peer and fall back to the TURN relay (coturn). The server
+// only relays signalling (SDP / ICE), issues TURN credentials, pushes the
+// incoming call and keeps a small call log.
+
+// One WebRTC ICE server (RTCIceServer). STUN entries have no credentials.
+message IceServer {
+    repeated string urls = 1 [json_name = "urls"];
+    string username      = 2 [json_name = "username"];
+    string credential    = 3 [json_name = "credential"];
+}
+
+enum CallKind {
+    CALL_KIND_UNSPECIFIED = 0;
+    CALL_KIND_VOICE       = 1;
+    CALL_KIND_VIDEO       = 2;
+}
+
+enum CallSignalType {
+    CALL_SIGNAL_TYPE_UNSPECIFIED = 0;
+    // caller → callee: offer SDP (sent by the server on StartCall).
+    CALL_SIGNAL_TYPE_INVITE      = 1;
+    // callee device received the invite and is ringing.
+    CALL_SIGNAL_TYPE_RINGING     = 2;
+    // callee answered: answer SDP.
+    CALL_SIGNAL_TYPE_ACCEPT      = 3;
+    // callee declined.
+    CALL_SIGNAL_TYPE_REJECT      = 4;
+    // callee device is busy (e.g. a cellular call).
+    CALL_SIGNAL_TYPE_BUSY        = 5;
+    // caller hung up before the answer.
+    CALL_SIGNAL_TYPE_CANCEL      = 6;
+    // either side ended the call.
+    CALL_SIGNAL_TYPE_HANGUP      = 7;
+    // one ICE candidate (candidate_json).
+    CALL_SIGNAL_TYPE_ICE         = 8;
+    // offer/answer during the call (e.g. camera toggle).
+    CALL_SIGNAL_TYPE_RENEGOTIATE = 9;
+    // mute / camera flags (payload_json).
+    CALL_SIGNAL_TYPE_MEDIA_STATE = 10;
+    // server: nobody answered within the ring timeout.
+    CALL_SIGNAL_TYPE_TIMEOUT     = 11;
+}
+
+// One signalling event, delivered through StreamChatList (want_calls) or
+// StreamMessages (want_calls).
+message CallSignal {
+    string call_id         = 1 [json_name = "call_id"];
+    CallSignalType type    = 2 [json_name = "type"];
+    string from_user_id    = 3 [json_name = "from_user_id"];
+    string to_user_id      = 4 [json_name = "to_user_id"];
+    CallKind kind          = 5 [json_name = "kind"];
+    string sdp             = 6 [json_name = "sdp"];
+    string candidate_json  = 7 [json_name = "candidate_json"];
+    string payload_json    = 8 [json_name = "payload_json"];
+    int64 created_at       = 9 [json_name = "created_at"];
+}
+
+// One row of the caller's own call log.
+message CallLogEntry {
+    string call_id     = 1 [json_name = "call_id"];
+    string peer_id     = 2 [json_name = "peer_id"];
+    bool outgoing      = 3 [json_name = "outgoing"];
+    CallKind kind      = 4 [json_name = "kind"];
+    // ringing | missed | rejected | completed | cancelled | busy | failed
+    string status      = 5 [json_name = "status"];
+    int64 started_at   = 6 [json_name = "started_at"];
+    int64 answered_at  = 7 [json_name = "answered_at"];
+    int64 ended_at     = 8 [json_name = "ended_at"];
+    int64 duration_s   = 9 [json_name = "duration_s"];
+}
+
+message GetIceServersRequest {}
+
+message GetIceServersResponse {
+    repeated IceServer ice_servers = 1 [json_name = "ice_servers"];
+    // Unix seconds when the TURN credentials stop working.
+    int64 expires_at               = 2 [json_name = "expires_at"];
+}
+
+message StartCallRequest {
+    string peer_id   = 1 [json_name = "peer_id"];
+    CallKind kind    = 2 [json_name = "kind"];
+    string sdp_offer = 3 [json_name = "sdp_offer"];
+}
+
+message StartCallResponse {
+    string call_id                 = 1 [json_name = "call_id"];
+    repeated IceServer ice_servers = 2 [json_name = "ice_servers"];
+}
+
+message SendCallSignalRequest {
+    string call_id        = 1 [json_name = "call_id"];
+    CallSignalType type   = 2 [json_name = "type"];
+    string sdp            = 3 [json_name = "sdp"];
+    string candidate_json = 4 [json_name = "candidate_json"];
+    string payload_json   = 5 [json_name = "payload_json"];
+}
+
+message SendCallSignalResponse {}
+
+message ListCallLogRequest {
+    string cursor = 1 [json_name = "cursor"];
+    int32 limit   = 2 [json_name = "limit"];
+}
+
+message ListCallLogResponse {
+    repeated CallLogEntry entries = 1 [json_name = "entries"];
+    string next_cursor            = 2 [json_name = "next_cursor"];
+}
+
+message DeleteCallLogEntryRequest {
+    string call_id = 1 [json_name = "call_id"];
+}
+
+message DeleteCallLogEntryResponse {}
