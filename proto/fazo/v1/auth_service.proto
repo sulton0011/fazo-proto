@@ -142,4 +142,43 @@ service AuthService {
             body: "*"
         };
     }
+
+    // Two-step verification. When enabled, Login / LoginWithPhone answer
+    // two_fa_required + two_fa_token instead of tokens; CheckTwoFa finishes.
+    rpc CheckTwoFa(CheckTwoFaRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/2fa/check"
+            body: "*"
+        };
+    }
+
+    // "Forgot password": the extra password is removed 7 days later, at the
+    // next sign-in, unless the owner signs in with it before then.
+    rpc RequestTwoFaReset(RequestTwoFaResetRequest) returns (RequestTwoFaResetResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/2fa/reset"
+            body: "*"
+        };
+    }
+
+    rpc GetTwoFa(GetTwoFaRequest) returns (GetTwoFaResponse) {
+        option (google.api.http) = {
+            get: "/v1/auth/2fa"
+        };
+    }
+
+    // Enables or changes the extra password (current_password when enabled).
+    rpc SetTwoFa(SetTwoFaRequest) returns (GetTwoFaResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/2fa"
+            body: "*"
+        };
+    }
+
+    rpc DisableTwoFa(DisableTwoFaRequest) returns (GetTwoFaResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/2fa/disable"
+            body: "*"
+        };
+    }
 }

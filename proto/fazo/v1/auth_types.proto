@@ -30,6 +30,12 @@ message LoginResponse {
     string access_token  = 1 [json_name = "access_token"];
     string refresh_token = 2 [json_name = "refresh_token"];
     User user            = 3 [json_name = "user"];
+    // Two-step verification is on: no tokens yet. Send the extra password
+    // with two_fa_token to CheckTwoFa (valid 10 minutes).
+    bool two_fa_required    = 4 [json_name = "two_fa_required"];
+    string two_fa_token     = 5 [json_name = "two_fa_token"];
+    string two_fa_hint      = 6 [json_name = "two_fa_hint"];
+    int64 two_fa_reset_at   = 7 [json_name = "two_fa_reset_at"];  // unix s; 0 = no reset pending
 }
 
 message RefreshTokenRequest {
@@ -283,4 +289,37 @@ message AttachPhoneRequest {
 
 message AttachPhoneResponse {
     User user = 1 [json_name = "user"];  // phone and phone_verified now set
+}
+
+// ---------- Two-step verification ----------
+
+message CheckTwoFaRequest {
+    string two_fa_token = 1 [json_name = "two_fa_token"];
+    string password     = 2 [json_name = "password"];
+}
+
+message RequestTwoFaResetRequest {
+    string two_fa_token = 1 [json_name = "two_fa_token"];
+}
+
+message RequestTwoFaResetResponse {
+    int64 reset_at = 1 [json_name = "reset_at"];  // unix s when the password goes away
+}
+
+message GetTwoFaRequest {}
+
+message GetTwoFaResponse {
+    bool enabled    = 1 [json_name = "enabled"];
+    string hint     = 2 [json_name = "hint"];
+    int64 reset_at  = 3 [json_name = "reset_at"];  // 0 = no reset pending
+}
+
+message SetTwoFaRequest {
+    string current_password = 1 [json_name = "current_password"];  // required when already enabled
+    string new_password     = 2 [json_name = "new_password"];      // 6-64 characters
+    string hint             = 3 [json_name = "hint"];              // optional, must not equal the password
+}
+
+message DisableTwoFaRequest {
+    string current_password = 1 [json_name = "current_password"];
 }
