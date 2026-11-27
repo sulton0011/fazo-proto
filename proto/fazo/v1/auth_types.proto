@@ -9,6 +9,7 @@ message RegisterRequest {
     string username  = 2 [json_name = "username"];
     string password  = 3 [json_name = "password"];
     string phone     = 4 [json_name = "phone"];  // deprecated: ignored, use RegisterWithPhone
+    DeviceInfo device = 5 [json_name = "device"];  // optional, shown in the sessions list
 }
 
 message RegisterResponse {
@@ -22,6 +23,7 @@ message LoginRequest {
     string password  = 2 [json_name = "password"];
     string fcm_token = 3 [json_name = "fcm_token"];  // optional
     string platform  = 4 [json_name = "platform"];   // optional: ios|android|web
+    DeviceInfo device = 5 [json_name = "device"];  // optional, shown in the sessions list
 }
 
 message LoginResponse {
@@ -34,6 +36,7 @@ message RefreshTokenRequest {
     string refresh_token = 1 [json_name = "refresh_token"];
     string fcm_token     = 2 [json_name = "fcm_token"];  // optional
     string platform      = 3 [json_name = "platform"];   // optional: ios|android|web
+    DeviceInfo device = 4 [json_name = "device"];  // optional, keeps the session row current
 }
 
 message UpdateDeviceTokenRequest {
@@ -186,6 +189,7 @@ message RegisterWithPhoneRequest {
     string full_name          = 4 [json_name = "full_name"];
     string fcm_token          = 5 [json_name = "fcm_token"];  // optional
     string platform           = 6 [json_name = "platform"];   // optional: ios|android|web
+    DeviceInfo device         = 7 [json_name = "device"];     // optional
 }
 
 message ResetPasswordRequest {
@@ -211,4 +215,72 @@ message LoginWithPhoneRequest {
     string verification_token = 1 [json_name = "verification_token"];  // from VerifyOtp with purpose "login"
     string fcm_token          = 2 [json_name = "fcm_token"];           // optional
     string platform           = 3 [json_name = "platform"];            // optional: ios|android|web
+    DeviceInfo device         = 4 [json_name = "device"];     // optional
+}
+
+// ---------- Sessions and phone attach ----------
+
+// DeviceInfo describes the app install a session belongs to.
+message DeviceInfo {
+    string device_model = 1 [json_name = "device_model"];  // e.g. "iPhone 15 Pro"
+    string os_version   = 2 [json_name = "os_version"];    // e.g. "iOS 18.2"
+    string app_version  = 3 [json_name = "app_version"];   // e.g. "1.0.2 (5)"
+}
+
+// Session is one signed-in device (one refresh token).
+message Session {
+    string id             = 1 [json_name = "id"];
+    string platform       = 2 [json_name = "platform"];      // ios|android|web or ""
+    string device_model   = 3 [json_name = "device_model"];
+    string os_version     = 4 [json_name = "os_version"];
+    string app_version    = 5 [json_name = "app_version"];
+    string ip             = 6 [json_name = "ip"];
+    int64 created_at      = 7 [json_name = "created_at"];      // unix seconds (sign-in time)
+    int64 last_active_at  = 8 [json_name = "last_active_at"];  // unix seconds
+    bool current          = 9 [json_name = "current"];         // the caller's own session
+}
+
+message ListSessionsRequest {}
+
+message ListSessionsResponse {
+    repeated Session sessions = 1 [json_name = "sessions"];  // current first, then most recent
+    int32 ttl_days            = 2 [json_name = "ttl_days"];  // auto-terminate after this many idle days
+}
+
+message TerminateSessionRequest {
+    string session_id = 1 [json_name = "session_id"];
+}
+
+message TerminateSessionResponse {}
+
+message TerminateOtherSessionsRequest {}
+
+message TerminateOtherSessionsResponse {
+    int32 terminated = 1 [json_name = "terminated"];
+}
+
+message SetSessionTtlRequest {
+    int32 days = 1 [json_name = "days"];  // 7, 30, 90, 180 or 365
+}
+
+message SetSessionTtlResponse {
+    int32 days = 1 [json_name = "days"];
+}
+
+message SendAttachPhoneOtpRequest {
+    string phone = 1 [json_name = "phone"];  // +998XXXXXXXXX
+}
+
+message SendAttachPhoneOtpResponse {
+    string otp_id      = 1 [json_name = "otp_id"];
+    int32 expires_in   = 2 [json_name = "expires_in"];
+    int32 resend_after = 3 [json_name = "resend_after"];
+}
+
+message AttachPhoneRequest {
+    string verification_token = 1 [json_name = "verification_token"];  // from VerifyOtp (purpose "attach")
+}
+
+message AttachPhoneResponse {
+    User user = 1 [json_name = "user"];  // phone and phone_verified now set
 }

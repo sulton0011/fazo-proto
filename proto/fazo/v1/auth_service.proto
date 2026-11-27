@@ -93,4 +93,53 @@ service AuthService {
             body: "*"
         };
     }
+
+    // AttachPhone flow for accounts without a verified phone (username +
+    // password sign-ups): send a code, VerifyOtp it, then AttachPhone. A
+    // verified phone opens the wallet and premium.
+    rpc SendAttachPhoneOtp(SendAttachPhoneOtpRequest) returns (SendAttachPhoneOtpResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/phone/attach/otp"
+            body: "*"
+        };
+    }
+
+    rpc AttachPhone(AttachPhoneRequest) returns (AttachPhoneResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/phone/attach"
+            body: "*"
+        };
+    }
+
+    // Active sessions (one per signed-in device), Telegram style.
+    rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/auth/sessions"
+        };
+    }
+
+    // Ends one other session. A session younger than 24 hours may not end
+    // older ones (FailedPrecondition, reason in the message: "session too new").
+    rpc TerminateSession(TerminateSessionRequest) returns (TerminateSessionResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/sessions/{session_id}/terminate"
+            body: "*"
+        };
+    }
+
+    // Ends every session except the caller's (same 24-hour rule).
+    rpc TerminateOtherSessions(TerminateOtherSessionsRequest) returns (TerminateOtherSessionsResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/sessions/terminate_others"
+            body: "*"
+        };
+    }
+
+    // Sessions idle longer than this many days end on their own.
+    rpc SetSessionTtl(SetSessionTtlRequest) returns (SetSessionTtlResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/sessions/ttl"
+            body: "*"
+        };
+    }
 }
